@@ -1,0 +1,3 @@
+20:41:02 GPU 1: refit_zero_lr1e-4_s0_step100 -> baking + serving on :8011
+20:43:34 GPU 1: refit_zero_lr1e-4_s0_step100 done rc=0: final answer
+20:43:35 all done

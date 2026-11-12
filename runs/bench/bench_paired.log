@@ -1,0 +1,12 @@
+20:58:15 GPU 1: base_paired0 -> baking + serving on :8011
+20:58:15 GPU 3: refit_zero_lr1e-4_s0_step100_paired0 -> baking + serving on :8013
+20:58:15 GPU 4: base_paired300 -> baking + serving on :8014
+20:58:15 GPU 6: refit_zero_lr1e-4_s0_step100_paired300 -> baking + serving on :8016
+21:01:46 GPU 1: base_paired0 done rc=0: PASS 140 / FAIL 118 / DECOY 36 / NOT_STATED 6
+21:01:58 GPU 4: base_paired300 done rc=0: PASS 148 / FAIL 103 / DECOY 42 / NOT_STATED 7
+21:02:11 GPU 3: refit_zero_lr1e-4_s0_step100_paired0 done rc=0: final answer
+21:04:04 GPU 6: refit_zero_lr1e-4_s0_step100_paired300 done rc=0: PASS 157 / FAIL 101 / DECOY 39 / NOT_STATED
+21:04:05 all done
+21:04:05 GPU 1: base_paired0_dup -> baking + serving on :8011
+21:06:29 GPU 1: base_paired0_dup done rc=0: PASS 26 / FAIL 23 / DECOY 10 / NOT_STATED 1
+21:06:30 all done

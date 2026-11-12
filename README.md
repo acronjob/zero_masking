@@ -46,9 +46,9 @@ docker stop paper_seed0                                       # stop a run
 | seed | step 0 | step 25 | step 50 | best (step) | last eval |
 |---|---|---|---|---|---|
 | 0 | 44.8 | 55.6 | 58.6 | 58.6 (50) | 58.2 (300) |
-| 1 | 47.6 | 58.2 | 60.8 | 60.8 (50) | 60.5 (225) |
-| 2 | 48.0 | 56.7 | 58.7 | 59.7 (100) | 58.5 (225) |
-| 3 | 49.3 | 57.7 | 59.1 | 59.3 (125) | 57.4 (200) |
+| 1 | 48.0 | 56.7 | 58.7 | 59.7 (100) | 58.5 (225) |
+| 2 | 49.3 | 57.7 | 59.1 | 59.3 (125) | 57.4 (200) |
+| 3 | 47.6 | 58.2 | 60.8 | 60.8 (50) | 60.5 (225) |
 | mean | 47.4 ± 1.9 | 57.1 | 59.3 ± 1.0 | | |
 
 Step 0 is the Wanda-initialised mask with about 0.18% of `gate_proj` weights deleted. Almost all of the gain arrives by
@@ -84,6 +84,47 @@ computing a ticket count and hours (expected 72 and 46). Settings: 10 runs per m
 The base model and all 29 masks tested (steps 0–150 for every seed, plus seed 0's step 175) scored **0/10**. None of
 the 249 parseable answers got either number right. The test is beyond a 0.8B model, so it can't distinguish the
 masks. The run was stopped before the remaining later-step masks.
+
+### Refit: retrain the weights Deletion Tuning deleted (`runs/refit_*`)
+
+`train_grpo_paper.py --refit_mask runs/paper_seed3/mask_step50.pt` freezes the model and trains only the real values
+of the 190,761 `gate_proj` coordinates that the best mask deleted. That mask is seed 3 at step 50, which scores 60.8%.
+The recipe is the same GRPO setup, with weight decay 0 and 150 steps. `--refit_init zero` starts from the
+deletion-tuned model. `--refit_init orig` starts from the original values, i.e. the unmodified model.
+`--refit_random` trains the same number of random coordinates per layer instead. Each eval saves the values as
+`refit_step{N}.pt`, and `tools/apply_mask.py` bakes them into a checkpoint.
+
+| run (1 seed each) | trained coordinates | start | lr | step 0 | best (step) | step 150 |
+|---|---|---|---|---|---|---|
+| `refit_zero_lr1e-4_s0` | deleted by the mask | 0 | 1e-4 | 60.8 | **65.0** (125) | 64.6 |
+| `refit_zero_lr1e-5_s0` | deleted by the mask | 0 | 1e-5 | 60.8 | 62.1 (150) | 62.1 |
+| `refit_orig_lr1e-4_s0` | deleted by the mask | original | 1e-4 | 48.4 | 61.9 (150) | 61.9 |
+| `refit_rand_lr1e-4_s0` | random, same count | original | 1e-4 | 49.1 | 60.3 (125) | 59.9 |
+
+Deleting first and then retraining the deleted coordinates reaches about 65%. That beats the mask alone (60.8%),
+training the same coordinates from their original values (61.9%), and training random coordinates (about 60%). There
+is only one seed per arm, so the gaps of about 3 points between arms need more seeds to confirm.
+`python3 dashboard/server.py --host 0.0.0.0 --port 8766 --include "refit_*" --page refit.html` serves a dashboard
+for these runs.
+
+### Estonia: repeats and a paired comparison
+
+Single 30-request estonia runs are too noisy to compare models. The base model alone scored 17, 17, 12 and 18 out of
+30 across four identical runs. The refit at step 100 scored 19, 15, 15 and 20. In total that is 64/120 vs 69/120, and a
+two-proportion test gives p ≈ 0.5.
+
+The paired comparison uses `tools/bench_masks.py --seed-bases 0,300 --runs 300`. Both models get 600 requests at
+concurrency 30, and request i is sampled with seed base+i on both. `tools/paired_compare.py` matches requests by seed
+and runs an exact McNemar test on the requests where the two models disagree. As a check, base rerun against itself
+gave the identical answer on 57/60 requests.
+
+| model | GSM8K | estonia pass (600 paired) | only base / only model | vs base |
+|---|---|---|---|---|
+| base | 48.4 | 48.0% | – | – |
+| refit, step 100 | 64.1 | 48.5% | 33 / 36 | +0.5 pts, p = 0.81 |
+| refit, step 125 | 65.0 | 46.0% | 39 / 27 | −2.0 pts, p = 0.18 |
+
+The 16-point GSM8K gain comes with no measurable change in long-context retrieval, within about ±3 points.
 
 ## Dashboard
 

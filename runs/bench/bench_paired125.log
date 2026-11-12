@@ -1,0 +1,5 @@
+21:06:52 GPU 1: refit_zero_lr1e-4_s0_step125_paired0 -> baking + serving on :8011
+21:06:52 GPU 3: refit_zero_lr1e-4_s0_step125_paired300 -> baking + serving on :8013
+21:12:10 GPU 1: refit_zero_lr1e-4_s0_step125_paired0 done rc=0: final answer
+21:14:46 GPU 3: refit_zero_lr1e-4_s0_step125_paired300 done rc=0: PASS 142 / FAIL 107 / DECOY 42 / NOT_STATED
+21:14:47 all done

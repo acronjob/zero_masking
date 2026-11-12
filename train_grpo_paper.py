@@ -23,6 +23,11 @@ Matches the repo:
 Differs (unavoidable / by request): Qwen3.5-0.8B (paper: Llama 3.2 Instruct); rollouts in vLLM 0.33 in-process
 (paper: vLLM 0.11 via verl), or HF generate with --engine hf;
 micro-batches executed as padded length-sorted chunks (same loss weights as verl's packed micro-batches).
+
+Refit mode (--refit_mask PATH): instead of learning a mask, train the real values of a fixed set of gate_proj
+coordinates (the ones a saved Deletion Tuning mask deleted, or --refit_random: the same number of random coordinates
+per layer). --refit_init zero starts them at 0 (= the deletion-tuned model), orig at their original values. Same GRPO
+recipe; no Wanda init, sharpness schedule or mask regularizer. Evals save refit_step{N}.pt ({"idx", "delta"} per layer).
 """
 import argparse, json, math, os, random, re, time
 
@@ -64,6 +69,9 @@ p.add_argument("--eval_limit", type=int, default=0, help="smoke tests only: eval
 p.add_argument("--eval_only", action="store_true", help="step-0 eval then exit (engine comparison)")
 p.add_argument("--max_steps", type=int, default=0, help="stop early (timing tests); schedules still use full length")
 p.add_argument("--out", default="/workspace/runs/paper_seed0")
+p.add_argument("--refit_mask", default="", help="train the values of the coordinates this saved mask deleted")
+p.add_argument("--refit_init", choices=["zero", "orig"], default="zero")
+p.add_argument("--refit_random", action="store_true", help="random coordinates instead (same count per layer)")
 args = p.parse_args()
 
 os.makedirs(args.out, exist_ok=True)
@@ -135,8 +143,20 @@ class SparseLinear(nn.Module):
         self.sharpness = args.sharpness_start
         self.mode = "soft"  # soft | hard | dense
         self._hard = None
+        self.idx = None  # refit mode: flat indices of trainable coordinates
+
+    def setup_refit(self, idx, init):
+        self.idx = idx.to(self.weight.device)
+        del self.gate
+        v = self.weight.view(-1)[self.idx].float()
+        self.delta = nn.Parameter(torch.zeros_like(v) if init == "zero" else v.clone())
+
+    def eff_weight(self):
+        return self.weight.view(-1).index_put((self.idx,), self.delta.to(self.weight.dtype)).view_as(self.weight)
 
     def forward(self, x):
+        if self.idx is not None:
+            return F.linear(x, self.eff_weight())
         if self.mode == "dense":
             return F.linear(x, self.weight)
         if self.mode == "hard":
@@ -158,7 +178,7 @@ for name, mod in list(model.named_modules()):
             sl = SparseLinear(child); setattr(mod, cname, sl); masked.append(sl)
             # checkpoint tensor name, used to push the hard-masked weight into vLLM
             sl.ckpt_name = "model.language_model." + f"{name}.{cname}".removeprefix("model.") + ".weight"
-gate_total = sum(m.gate.numel() for m in masked)
+gate_total = sum(m.weight.numel() for m in masked)
 print(f"masked {len(masked)} gate_proj layers ({gate_total/1e6:.1f}M logits); {total_steps} steps, "
       f"{total_opt_steps} optimizer steps", flush=True)
 
@@ -197,10 +217,28 @@ def wanda_init():
     set_mode("soft")
 
 
-wanda_init()
+REFIT = bool(args.refit_mask)
+if REFIT:
+    ref = torch.load(args.refit_mask)
+    assert len(ref) == len(masked)
+    rg = torch.Generator().manual_seed(1234)
+    for m, idx in zip(masked, ref):
+        if args.refit_random:
+            idx = torch.randperm(m.weight.numel(), generator=rg)[:idx.numel()]
+        m.setup_refit(idx.long(), args.refit_init)
+    n_refit = sum(m.delta.numel() for m in masked)
+    print(f"refit: {n_refit} coordinates ({'random' if args.refit_random else args.refit_mask}), "
+          f"init={args.refit_init}", flush=True)
+else:
+    wanda_init()
 
 
 def mask_stats():
+    if REFIT:
+        d = torch.cat([m.delta.detach() for m in masked])
+        o = torch.cat([m.weight.view(-1)[m.idx].float() for m in masked])
+        return {"n_trainable": d.numel(), "delta_rms": d.pow(2).mean().sqrt().item(),
+                "orig_rms": o.pow(2).mean().sqrt().item(), "dist_from_orig_rms": (d - o).pow(2).mean().sqrt().item()}
     deleted = sum(int((m.gate <= 0).sum()) for m in masked)
     return {"deleted": deleted, "frac_of_gate": deleted / gate_total, "frac_of_model": deleted / n_params}
 
@@ -209,7 +247,7 @@ print("after wanda init:", mask_stats(), flush=True)
 
 model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
 model.config.use_cache = False
-gates = [m.gate for m in masked]
+gates = [m.delta for m in masked] if REFIT else [m.gate for m in masked]
 opt = torch.optim.AdamW(gates, lr=args.lr, betas=(0.9, 0.999), weight_decay=args.weight_decay)
 eos_ids = sorted({tok.convert_tokens_to_ids("<|im_end|>"), tok.convert_tokens_to_ids("<|endoftext|>")}
                  | ({model.generation_config.eos_token_id} if isinstance(model.generation_config.eos_token_id, int)
@@ -224,7 +262,7 @@ def vllm_push():
     """Wake vLLM, write W * 1[G > 0] into its gate_proj in place, and verify by reading it back."""
     if not vllm_awake[0]:
         llm.wake_up(); vllm_awake[0] = True
-    hard = [(m.ckpt_name, m.weight * (m.gate > 0).to(m.weight.dtype)) for m in masked]
+    hard = [(m.ckpt_name, m.eff_weight() if REFIT else m.weight * (m.gate > 0).to(m.weight.dtype)) for m in masked]
     llm.apply_model(lambda mdl: mdl.load_weights(hard))
     llm.reset_prefix_cache()
     # vLLM fuses gate_proj and up_proj into gate_up_proj ([gate; up]); the gate half must equal our hard weight
@@ -334,8 +372,12 @@ def do_eval(step):
     t0 = time.time(); acc = evaluate()
     rec = {"step": step, "eval_acc": acc, **mask_stats(), "eval_s": round(time.time() - t0, 1)}
     print("EVAL", rec, flush=True); log.write(json.dumps(rec) + "\n"); log.flush()
-    torch.save([torch.nonzero((m.gate <= 0).flatten()).squeeze(1).int().cpu() for m in masked],
-               os.path.join(args.out, f"mask_step{step}.pt"))
+    if REFIT:
+        torch.save([{"idx": m.idx.int().cpu(), "delta": m.delta.detach().cpu()} for m in masked],
+                   os.path.join(args.out, f"refit_step{step}.pt"))
+    else:
+        torch.save([torch.nonzero((m.gate <= 0).flatten()).squeeze(1).int().cpu() for m in masked],
+                   os.path.join(args.out, f"mask_step{step}.pt"))
 
 
 do_eval(0)  # val_before_train
@@ -376,7 +418,7 @@ for epoch in range(args.epochs):
             sharp = args.sharpness_start + (args.sharpness_end - args.sharpness_start) * progress
             for m in masked:
                 m.sharpness = sharp
-            lam = args.mask_weight_reg * (1.0 - progress)
+            lam = 0.0 if REFIT else args.mask_weight_reg * (1.0 - progress)
             mb_idx = list(range(mb * mb_seqs, (mb + 1) * mb_seqs))
             opt.zero_grad(set_to_none=True)
             for micro in dynamic_micro_batches(mb_idx, lens):
@@ -413,7 +455,7 @@ for epoch in range(args.epochs):
 
         rec = {"step": step, "epoch": epoch, "reward": rewards.mean().item(), **{k: v for k, v in mstats.items()
                if k != "grad_norm"}, "grad_norm": max(mstats["grad_norm"]), "alpha": sharp, "lambda": lam,
-               "frac_deleted_gate": mask_stats()["frac_of_gate"], "mean_len": sum(map(len, comps)) / len(comps),
+               **({"delta_rms": mask_stats()["delta_rms"]} if REFIT else {"frac_deleted_gate": mask_stats()["frac_of_gate"]}), "mean_len": sum(map(len, comps)) / len(comps),
                "clip_len_frac": sum(len(c) >= args.max_response_length for c in comps) / len(comps),
                "gen_s": round(t_gen, 1), "step_s": round(time.time() - t0, 1)}
         print(rec, flush=True); log.write(json.dumps(rec) + "\n"); log.flush()

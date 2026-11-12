@@ -1,0 +1,109 @@
+╭──────────────────────────── NVIDIA P2P Override ─────────────────────────────╮
+│ Effective: yes                                                               │
+│ Configured file: no (/etc/modprobe.d/nvidia-p2p-override.conf)               │
+│ Runtime: ForceP2P=0x11; RMForceP2PType=1; RMPcieP2PType=2;                   │
+│ GrdmaPciTopoCheckOverride=1; EnableResizableBar=1; DmaRemapPeerMmio=1        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────── Configuration ────────────────────────────────╮
+│ Estonia Long-Context Chain Test                                              │
+│ Model: refit_zero_lr1e-4_s0_step100_r1 @ 127.0.0.1:8013                      │
+│ Prompt: profile:estonia                                                      │
+│ Concurrency: 30                                                              │
+│ Measured runs: 30 | Max tokens: 40000                                        │
+│ Scoring: PASS / DECOY / NOT_STATED / FAIL asserted country (expected         │
+│ Estonia)                                                                     │
+│ Sampling: server/model defaults (unpinned) | Watchdog: stall 600s,           │
+│ wall-clock off                                                               │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭────────────────────────────── Completion Stats ──────────────────────────────╮
+│ Estonia Long-Context Chain Test                                              │
+│ The same 700k-character packet is resampled N times. The model must follow a │
+│ six-hop cross-reference chain past planted decoys and name the vendor's      │
+│ country. Wrong answers split into DECOY (took the planted country),          │
+│ NOT_STATED (gave up) and FAIL; incomplete streams are reported separately.   │
+│ Built-in profile run at fixed concurrency C=30.                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Profile                                                       
+╭────────────────┬───────────────────────────────────────────╮
+│ field          │ value                                     │
+├────────────────┼───────────────────────────────────────────┤
+│ profile        │ estonia                                   │
+│ prompt         │ profile:estonia                           │
+│ prompt chars   │ 707,468                                   │
+│ requested runs │ 30                                        │
+│ concurrency    │ 30                                        │
+│ max tokens     │ 40000                                     │
+│ scoring        │ country_exact                             │
+│ expected       │ Estonia                                   │
+│ prompt sha256  │ 8c045ba5e8299b25                          │
+│ prefill scout  │ 136,544 prompt tok / 3.71s = 36,770 tok/s │
+╰────────────────┴───────────────────────────────────────────╯
+╭──────────────────────── Whole-run GPU Power ─────────────────────────╮
+│ avg 1,712 W | max 2,266 W | limit 2,400 W | over 2m 06s | 49 samples │
+╰──────────────────────────────────────────────────────────────────────╯
+Concurrency Results                                                             
+╭─┬─────┬──────────────────────────────┬───┬───────┬────────┬────────┬───────┬─╮
+│ │ do… │                        score │ … │ outp… │ outpu… │ aggre… │ avg … │ │
+├─┼─────┼──────────────────────────────┼───┼───────┼────────┼────────┼───────┼─┤
+│ │ 30… │ PASS 15 / FAIL 11 / DECOY 3… │ … │     5 │  2,128 │  298.4 │   8.5 │ │
+╰─┴─────┴──────────────────────────────┴───┴───────┴────────┴────────┴───────┴─╯
+Selected C=30                                                                   
+╭───────────────────────────────┬──────────────────────────────────────────────╮
+│ metric                        │                                        value │
+├───────────────────────────────┼──────────────────────────────────────────────┤
+│ completed                     │                                        30/30 │
+│ score                         │        PASS 15 / FAIL 11 / DECOY 3 / TRUNC 1 │
+│ stars                         │                                ★★★★★✕✕✕✕✕ 👍 │
+│ pass rate                     │                                50.0% (15/30) │
+│ pass rate, finished runs only │                  51.7% (15/29); 1 incomplete │
+│                               │         (truncated/stalled/timeout) excluded │
+│ decoy                         │                                            3 │
+│ unparseable (format)          │                                            6 │
+│ hit max_tokens                │  1  (1 produced no answer, 0 answered before │
+│                               │                                     the cap) │
+│ completion tokens avg         │                                        1,615 │
+│ completion tokens p50         │                                            5 │
+│ completion tokens p90         │                                        2,128 │
+│ completion tokens p99         │                                       29,436 │
+│ elapsed avg                   │                                         8.5s │
+│ TTFT avg                      │                                        3.05s │
+│ aggregate gen tok/s           │                                        298.4 │
+│ mean per-request gen tok/s    │                                      4,996.7 │
+╰───────────────────────────────┴──────────────────────────────────────────────╯
+Failed Final Answers                                                            
+╭────┬────┬────────┬───────┬───────────────────────────────────────────────────╮
+│  # │  C │ tokens │ score │ final answer                                      │
+├────┼────┼────────┼───────┼───────────────────────────────────────────────────┤
+│  2 │ 30 │      3 │ FAIL  │ (unparseable: no country named in the visible     │
+│    │    │        │       │ answer) | Vicky                                   │
+│  3 │ 30 │      5 │ FAIL  │ USA (expected Estonia, got USA) | USA             │
+│  5 │ 30 │      5 │ DECOY │ Latvia (decoy answer: expected Estonia, got       │
+│    │    │        │       │ Latvia) | Latvia                                  │
+│  7 │ 30 │    475 │ FAIL  │ Romania (expected Estonia, got Romania) | Romania │
+│ 10 │ 30 │  3,572 │ FAIL  │ U.S (unparseable: final answer line names no      │
+│    │    │        │       │ country) | U.S                                    │
+│ 12 │ 30 │ 40,000 │ TRUNC │ (no answer: hit max_tokens limit) | No            │
+│ 14 │ 30 │      7 │ FAIL  │ Real (unparseable: final answer line names no     │
+│    │    │        │       │ country) | Real                                   │
+│ 15 │ 30 │      5 │ FAIL  │ Italy (expected Estonia, got Italy) | Italy       │
+│ 16 │ 30 │      4 │ FAIL  │ (unparseable: no country named in the visible     │
+│    │    │        │       │ answer) | VideFrance                              │
+│ 18 │ 30 │  2,168 │ FAIL  │ India (expected Estonia, got India) | <India>     │
+│ 19 │ 30 │     18 │ FAIL  │ (unparseable: no country named in the visible     │
+│    │    │        │       │ answer) | The manufacturer is **Nollis West**     │
+│    │    │        │       │ (w/o Nollis West)                                 │
+│ 22 │ 30 │  2,123 │ FAIL  │ Canada (expected Estonia, got Canada) | Canada    │
+╰────┴────┴────────┴───────┴───────────────────────────────────────────────────╯
+Interpretation: PASS means the country the visible answer asserts is the 
+expected one (an explicit 'Final answer:' line wins; otherwise the last line 
+that names a country). Countries mentioned only as a negated contrast ('not 
+Latvia') or in a parenthetical aside do not count. DECOY = the model committed 
+to the planted wrong country; NOT_STATED = the model said the packet does not 
+contain the answer (gave up); AMBIG = one conclusion line asserts two countries 
+(scored wrong, review manually); FAIL = another country or no country at all. 
+TRUNC/STALL/TIMEOUT (⊘) never produced a visible answer and are runtime 
+artifacts, reported separately from wrong answers. Private reasoning is never 
+scored. Quality bar: ★=PASS, ✕=wrong, ⊘=incomplete.
+
+Results saved to runs/bench/estonia_refit_zero_lr1e-4_s0_step100_r1.json
