@@ -1,0 +1,93 @@
+╭──────────────────────────── NVIDIA P2P Override ─────────────────────────────╮
+│ Effective: yes                                                               │
+│ Configured file: no (/etc/modprobe.d/nvidia-p2p-override.conf)               │
+│ Runtime: ForceP2P=0x11; RMForceP2PType=1; RMPcieP2PType=2;                   │
+│ GrdmaPciTopoCheckOverride=1; EnableResizableBar=1; DmaRemapPeerMmio=1        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────── Configuration ────────────────────────────────╮
+│ LAVD Context Consistency Test                                                │
+│ Model: seed2_step25 @ 127.0.0.1:8011                                         │
+│ Prompt: profile:lavd-test                                                    │
+│ Concurrency: 10                                                              │
+│ Measured runs: 10 | Max tokens: omitted (no client cap)                      │
+│ Scoring: EXACT / NEAR / FAIL numeric pair                                    │
+│ Sampling: server/model defaults (unpinned) | Watchdog: stall 600s,           │
+│ wall-clock off                                                               │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭────────────────────────────── Completion Stats ──────────────────────────────╮
+│ LAVD Context Consistency Test                                                │
+│ Arithmetic is intentionally simple; the test checks whether the model keeps  │
+│ a long structured context consistent, finds human data-entry errors, applies │
+│ the repair rule, and returns the final ticket count and hours. Built-in      │
+│ profile run at fixed concurrency C=10.                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Profile                                            
+╭────────────────┬────────────────────────────────╮
+│ field          │ value                          │
+├────────────────┼────────────────────────────────┤
+│ profile        │ lavd-test                      │
+│ prompt         │ profile:lavd-test              │
+│ prompt chars   │ 48,302                         │
+│ requested runs │ 10                             │
+│ concurrency    │ 10                             │
+│ max tokens     │ omitted (server/model default) │
+│ scoring        │ ledger_lavd                    │
+│ expected       │ 72, 46                         │
+│ prompt sha256  │ 5c83674d5f0fd2a7               │
+│ dataset sha256 │ 612f8041bbca048c               │
+╰────────────────┴────────────────────────────────╯
+╭──────────────────────── Whole-run GPU Power ─────────────────────────╮
+│ avg 1,209 W | max 1,296 W | limit 2,400 W | over 1m 30s | 35 samples │
+╰──────────────────────────────────────────────────────────────────────╯
+Concurrency Results                                                             
+╭─────┬────────┬────┬──────┬───────────┬──────────┬────────────┬─────────┬─────╮
+│ pa… │ done/… │ s… │ sta… │ output t… │ output … │ aggregate… │ avg re… │ se… │
+├─────┼────────┼────┼──────┼───────────┼──────────┼────────────┼─────────┼─────┤
+│  10 │  10/10 │ F… │ ✕✕✕… │    15,664 │   23,974 │      352.6 │    40.8 │ yes │
+╰─────┴────────┴────┴──────┴───────────┴──────────┴────────────┴─────────┴─────╯
+Selected C=10                                 
+╭────────────────────────────┬───────────────╮
+│ metric                     │         value │
+├────────────────────────────┼───────────────┤
+│ completed                  │         10/10 │
+│ score                      │       FAIL 10 │
+│ stars                      │ ✕✕✕✕✕✕✕✕✕✕ 👍 │
+│ pass rate                  │   0.0% (0/10) │
+│ unparseable (format)       │             1 │
+│ hit max_tokens             │             0 │
+│ completion tokens avg      │        14,236 │
+│ completion tokens p50      │        15,664 │
+│ completion tokens p90      │        23,974 │
+│ completion tokens p99      │        33,597 │
+│ elapsed avg                │         40.8s │
+│ TTFT avg                   │         0.39s │
+│ aggregate gen tok/s        │         352.6 │
+│ mean per-request gen tok/s │         531.4 │
+╰────────────────────────────┴───────────────╯
+Failed Final Answers                                                            
+╭────┬────┬────────┬───────┬───────────────────────────────────────────────────╮
+│  # │  C │ tokens │ score │ final answer                                      │
+├────┼────┼────────┼───────┼───────────────────────────────────────────────────┤
+│  1 │ 10 │ 11,014 │ FAIL  │ 1, 10 (count -71, hours -36.00) | 10.00           │
+│  2 │ 10 │ 21,474 │ FAIL  │ 5, 0.75 (count -67, hours -45.25) | 0.75          │
+│  3 │ 10 │ 22,296 │ FAIL  │ 33, 0 (count -39, hours -46.00) | 33, 0           │
+│  4 │ 10 │      4 │ FAIL  │ (unparseable) | <thankay                          │
+│  5 │ 10 │ 34,666 │ FAIL  │ 9134469, 9.13446e+06 (count +9134397, hours       │
+│    │    │        │       │ +9134419.00) | Number of matching tickets: **430  │
+│  6 │ 10 │ 20,315 │ FAIL  │ 21, 8 (count -51, hours -38.00) |                 │
+│  7 │ 10 │ 22,786 │ FAIL  │ 26, 0 (count -46, hours -46.00) |                 │
+│  8 │ 10 │  7,137 │ FAIL  │ 0, 6.3 (count -72, hours -39.70) | 6.3            │
+│  9 │ 10 │  2,477 │ FAIL  │ 2, 2025 (count -70, hours +1979.00) | 5 + 2 +     │
+│    │    │        │       │ 0.25 + 0.5 + 3.75 + 2 + 3.5 + 3.5 + 3.5 + 2.5 =   │
+│    │    │        │       │ **20.25 hours                                     │
+│ 10 │ 10 │    194 │ FAIL  │ 134, 134 (count +62, hours +88.00) |              │
+╰────┴────┴────────┴───────┴───────────────────────────────────────────────────╯
+Interpretation: EXACT means the parsed ticket/hour totals are exactly 72, 46.0. 
+NEAR means both count and hours are within the configured tolerance; FAIL means 
+the answer was unparseable or outside tolerance. The 10-slot quality bar is a 
+rounded distribution: ★=EXACT, ☆=NEAR, ✕=FAIL.
+
+Results saved to 
+runs/bench/lavd-test_seed
+2_step25.json

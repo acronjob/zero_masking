@@ -1,0 +1,94 @@
+╭──────────────────────────── NVIDIA P2P Override ─────────────────────────────╮
+│ Effective: yes                                                               │
+│ Configured file: no (/etc/modprobe.d/nvidia-p2p-override.conf)               │
+│ Runtime: ForceP2P=0x11; RMForceP2PType=1; RMPcieP2PType=2;                   │
+│ GrdmaPciTopoCheckOverride=1; EnableResizableBar=1; DmaRemapPeerMmio=1        │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────── Configuration ────────────────────────────────╮
+│ LAVD Context Consistency Test                                                │
+│ Model: seed1_step50 @ 127.0.0.1:8016                                         │
+│ Prompt: profile:lavd-test                                                    │
+│ Concurrency: 10                                                              │
+│ Measured runs: 10 | Max tokens: omitted (no client cap)                      │
+│ Scoring: EXACT / NEAR / FAIL numeric pair                                    │
+│ Sampling: server/model defaults (unpinned) | Watchdog: stall 600s,           │
+│ wall-clock off                                                               │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭────────────────────────────── Completion Stats ──────────────────────────────╮
+│ LAVD Context Consistency Test                                                │
+│ Arithmetic is intentionally simple; the test checks whether the model keeps  │
+│ a long structured context consistent, finds human data-entry errors, applies │
+│ the repair rule, and returns the final ticket count and hours. Built-in      │
+│ profile run at fixed concurrency C=10.                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Profile                                            
+╭────────────────┬────────────────────────────────╮
+│ field          │ value                          │
+├────────────────┼────────────────────────────────┤
+│ profile        │ lavd-test                      │
+│ prompt         │ profile:lavd-test              │
+│ prompt chars   │ 48,302                         │
+│ requested runs │ 10                             │
+│ concurrency    │ 10                             │
+│ max tokens     │ omitted (server/model default) │
+│ scoring        │ ledger_lavd                    │
+│ expected       │ 72, 46                         │
+│ prompt sha256  │ 5c83674d5f0fd2a7               │
+│ dataset sha256 │ 612f8041bbca048c               │
+╰────────────────┴────────────────────────────────╯
+╭─────────────────────── Whole-run GPU Power ────────────────────────╮
+│ avg 966 W | max 1,035 W | limit 2,400 W | over 1m 37s | 38 samples │
+╰────────────────────────────────────────────────────────────────────╯
+Concurrency Results                                                             
+╭─────┬────────┬────┬──────┬───────────┬──────────┬────────────┬─────────┬─────╮
+│ pa… │ done/… │ s… │ sta… │ output t… │ output … │ aggregate… │ avg re… │ se… │
+├─────┼────────┼────┼──────┼───────────┼──────────┼────────────┼─────────┼─────┤
+│  10 │  10/10 │ F… │ ✕✕✕… │    19,240 │   29,116 │      311.8 │    60.0 │ yes │
+╰─────┴────────┴────┴──────┴───────────┴──────────┴────────────┴─────────┴─────╯
+Selected C=10                                 
+╭────────────────────────────┬───────────────╮
+│ metric                     │         value │
+├────────────────────────────┼───────────────┤
+│ completed                  │         10/10 │
+│ score                      │       FAIL 10 │
+│ stars                      │ ✕✕✕✕✕✕✕✕✕✕ 👍 │
+│ pass rate                  │   0.0% (0/10) │
+│ unparseable (format)       │             1 │
+│ hit max_tokens             │             0 │
+│ completion tokens avg      │        18,571 │
+│ completion tokens p50      │        19,240 │
+│ completion tokens p90      │        29,116 │
+│ completion tokens p99      │        32,034 │
+│ elapsed avg                │         60.0s │
+│ TTFT avg                   │         0.40s │
+│ aggregate gen tok/s        │         311.8 │
+│ mean per-request gen tok/s │         554.7 │
+╰────────────────────────────┴───────────────╯
+Failed Final Answers                                                            
+╭────┬────┬────────┬───────┬───────────────────────────────────────────────────╮
+│  # │  C │ tokens │ score │ final answer                                      │
+├────┼────┼────────┼───────┼───────────────────────────────────────────────────┤
+│  1 │ 10 │ 18,240 │ FAIL  │ 9, 3 (count -63, hours -43.00) | 36.09 3          │
+│  2 │ 10 │ 28,099 │ FAIL  │ 21, 2.184 (count -51, hours -43.82) | Matching    │
+│    │    │        │       │ Tickets: **21                                     │
+│  3 │ 10 │ 16,739 │ FAIL  │ 9134563, 1 (count +9134491, hours -45.00) |       │
+│  4 │ 10 │      4 │ FAIL  │ (unparseable) | <thankay                          │
+│  5 │ 10 │ 10,754 │ FAIL  │ 70, 14 (count -2, hours -32.00) | I'll proceed    │
+│    │    │        │       │ with **70, 350                                    │
+│  6 │ 10 │ 28,756 │ FAIL  │ 0, 14 (count -72, hours -32.00) | 2               │
+│  7 │ 10 │ 23,749 │ FAIL  │ 9134443, 9.13445e+06 (count +9134371, hours       │
+│    │    │        │       │ +9134403.00) | 4                                  │
+│  8 │ 10 │  6,768 │ FAIL  │ 60, 0 (count -12, hours -46.00) | Total Hours     │
+│    │    │        │       │ Spent: 0.00                                       │
+│  9 │ 10 │ 20,239 │ FAIL  │ 4, 185 (count -68, hours +139.00) | 185           │
+│ 10 │ 10 │ 32,358 │ FAIL  │ 30, 2025 (count -42, hours +1979.00) | 36         │
+╰────┴────┴────────┴───────┴───────────────────────────────────────────────────╯
+Interpretation: EXACT means the parsed ticket/hour totals are exactly 72, 46.0. 
+NEAR means both count and hours are within the configured tolerance; FAIL means 
+the answer was unparseable or outside tolerance. The 10-slot quality bar is a 
+rounded distribution: ★=EXACT, ☆=NEAR, ✕=FAIL.
+
+Results saved to 
+runs/bench/lavd-test_seed
+1_step50.json

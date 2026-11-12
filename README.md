@@ -77,6 +77,14 @@ sampling. `tools/bench_masks.py` serves one masked model per GPU. Each cell is P
 No mask differs from the base model by more than sampling noise, and there is no trend with training. The GSM8K gain
 neither hurts nor helps long-context retrieval at this sample size.
 
+### Long-context check: `--test-profile lavd-test`
+
+This test hides human errors in about 48K characters of structured data; the model must find and fix them before
+computing a ticket count and hours (expected 72 and 46). Settings: 10 runs per model and server-default sampling.
+The base model and all 29 masks tested (steps 0–150 for every seed, plus seed 0's step 175) scored **0/10**. None of
+the 249 parseable answers got either number right. The test is beyond a 0.8B model, so it can't distinguish the
+masks. The run was stopped before the remaining later-step masks.
+
 ## Dashboard
 
 ```bash

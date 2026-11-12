@@ -1,0 +1,64 @@
+18:13:37 GPU 0: base -> baking + serving on :8010
+18:13:37 GPU 1: seed0_step0 -> baking + serving on :8011
+18:13:37 GPU 6: seed1_step0 -> baking + serving on :8016
+18:13:37 GPU 7: seed2_step0 -> baking + serving on :8017
+18:17:04 GPU 0: base done rc=0: final answer
+18:17:05 GPU 0: seed3_step0 -> baking + serving on :8010
+18:17:07 GPU 7: seed2_step0 done rc=0: final answer
+18:17:08 GPU 7: seed0_step25 -> baking + serving on :8017
+18:17:17 GPU 6: seed1_step0 done rc=0: final answer
+18:17:18 GPU 6: seed1_step25 -> baking + serving on :8016
+18:18:54 GPU 1: seed0_step0 done rc=0: final answer
+18:18:55 GPU 1: seed2_step25 -> baking + serving on :8011
+18:20:53 GPU 6: seed1_step25 done rc=0: final answer
+18:20:54 GPU 6: seed3_step25 -> baking + serving on :8016
+18:22:48 GPU 1: seed2_step25 done rc=0: final answer
+18:22:49 GPU 1: seed0_step50 -> baking + serving on :8011
+18:24:16 GPU 6: seed3_step25 done rc=0: final answer
+18:24:17 GPU 0: seed3_step0 done rc=0: final answer
+18:24:18 GPU 6: seed1_step50 -> baking + serving on :8016
+18:24:18 GPU 0: seed2_step50 -> baking + serving on :8010
+18:25:54 GPU 1: seed0_step50 done rc=0: final answer
+18:25:55 GPU 1: seed3_step50 -> baking + serving on :8011
+18:25:58 GPU 7: seed0_step25 done rc=0: final answer
+18:26:00 GPU 7: seed0_step75 -> baking + serving on :8017
+18:28:17 GPU 6: seed1_step50 done rc=0: final answer
+18:28:18 GPU 6: seed1_step75 -> baking + serving on :8016
+18:29:29 GPU 7: seed0_step75 done rc=0: final answer
+18:29:30 GPU 7: seed2_step75 -> baking + serving on :8017
+18:29:33 GPU 0: seed2_step50 done rc=0: final answer
+18:29:34 GPU 0: seed3_step75 -> baking + serving on :8010
+18:32:55 GPU 7: seed2_step75 done rc=0: final answer
+18:32:56 GPU 7: seed0_step100 -> baking + serving on :8017
+18:33:22 GPU 0: seed3_step75 done rc=0: final answer
+18:33:23 GPU 0: seed1_step100 -> baking + serving on :8010
+18:36:16 GPU 6: seed1_step75 done rc=0: final answer
+18:36:18 GPU 6: seed2_step100 -> baking + serving on :8016
+18:36:28 GPU 7: seed0_step100 done rc=0: final answer
+18:36:29 GPU 7: seed3_step100 -> baking + serving on :8017
+18:41:30 GPU 6: seed2_step100 done rc=0: final answer
+18:41:31 GPU 6: seed0_step125 -> baking + serving on :8016
+18:42:13 GPU 0: seed1_step100 done rc=0: final answer
+18:42:14 GPU 0: seed1_step125 -> baking + serving on :8010
+18:44:15 GPU 1: seed3_step50 done rc=0: final answer
+18:44:16 GPU 1: seed2_step125 -> baking + serving on :8011
+18:44:31 GPU 6: seed0_step125 done rc=0: final answer
+18:44:32 GPU 6: seed3_step125 -> baking + serving on :8016
+18:45:34 GPU 0: seed1_step125 done rc=0: final answer
+18:45:35 GPU 0: seed0_step150 -> baking + serving on :8010
+18:48:04 GPU 1: seed2_step125 done rc=0: final answer
+18:48:05 GPU 1: seed1_step150 -> baking + serving on :8011
+18:48:38 GPU 6: seed3_step125 done rc=0: final answer
+18:48:39 GPU 6: seed2_step150 -> baking + serving on :8016
+18:48:52 GPU 0: seed0_step150 done rc=0: final answer
+18:48:54 GPU 0: seed3_step150 -> baking + serving on :8010
+18:50:51 GPU 7: seed3_step100 done rc=0: final answer
+18:50:52 GPU 7: seed0_step175 -> baking + serving on :8017
+18:51:31 GPU 1: seed1_step150 done rc=0: final answer
+18:51:33 GPU 1: seed1_step175 -> baking + serving on :8011
+18:52:33 GPU 0: seed3_step150 done rc=0: final answer
+18:52:34 GPU 0: seed2_step175 -> baking + serving on :8010
+18:53:01 GPU 6: seed2_step150 done rc=0: final answer
+18:53:03 GPU 6: seed3_step175 -> baking + serving on :8016
+18:53:51 GPU 7: seed0_step175 done rc=0: final answer
+18:53:52 GPU 7: seed0_step200 -> baking + serving on :8017
