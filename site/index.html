@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deletion Tuning — teaching an LLM by deleting weights</title>
+<style>
+:root {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface-1: #1a1a19; --surface-2: #222220;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+  --good: #0ca30c; --critical: #e66767;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s7: #9085e9;
+  --base: #898781;
+  --dt: var(--s1); --fft: var(--s2); --lora: var(--s3); --mth: var(--s4);
+}
+* { box-sizing: border-box; }
+html { scroll-snap-type: y proximity; scroll-behavior: smooth; }
+body { margin: 0; background: var(--page); color: var(--text-primary);
+  font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Inter, sans-serif; }
+code, .mono { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; font-size: .9em; }
+a { color: var(--s1); }
+.slide { min-height: 100vh; scroll-snap-align: start; padding: 72px 6vw 64px; position: relative;
+  display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid var(--grid); }
+.wrap { max-width: 1180px; width: 100%; margin: 0 auto; }
+.kicker { text-transform: uppercase; letter-spacing: .14em; font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+.kicker b { color: var(--s1); font-weight: 600; }
+h1 { font-size: clamp(38px, 6vw, 76px); line-height: 1.02; margin: 0 0 18px; letter-spacing: -0.02em; }
+h2 { font-size: clamp(28px, 3.6vw, 44px); line-height: 1.1; margin: 0 0 14px; letter-spacing: -0.01em; }
+h3 { font-size: 18px; margin: 0 0 6px; }
+.lead { font-size: clamp(17px, 1.6vw, 21px); color: var(--text-secondary); max-width: 820px; }
+.muted { color: var(--text-muted); }
+.sec { color: var(--text-secondary); }
+.grad { background: linear-gradient(90deg, #6fb0ff, #3987e5 40%, #9085e9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+.cols.w37 { grid-template-columns: 3fr 7fr; }
+.cols.w46 { grid-template-columns: 4fr 6fr; }
+.cols.w55 { grid-template-columns: 5fr 5fr; }
+@media (max-width: 900px) { .cols, .cols.w37, .cols.w46, .cols.w55 { grid-template-columns: 1fr; } }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+.card h3 { margin-bottom: 4px; }
+.card .cap { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+.grid4 > *, .grid3 > *, .grid2 > *, .cols > * { min-width: 0; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+@media (max-width: 900px) { .grid4, .grid3 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .grid4, .grid3, .grid2 { grid-template-columns: 1fr; } }
+.stat .big { font-size: clamp(30px, 3.4vw, 46px); font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; }
+.stat .lbl { color: var(--text-secondary); font-size: 14px; }
+.formula { font-family: "Latin Modern Math", "STIX Two Math", Cambria, Georgia, serif; font-size: clamp(22px, 2.6vw, 34px);
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px 22px; display: inline-block; margin: 6px 0 12px; }
+.formula .g { color: #6fb0ff; } .formula .a { color: var(--s4); }
+ul.clean { padding-left: 1.1em; margin: 8px 0; } ul.clean li { margin: 6px 0; color: var(--text-secondary); } ul.clean li b { color: var(--text-primary); }
+.pill { display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 99px; border: 1px solid var(--border); color: var(--text-secondary); margin-right: 6px; }
+.pill.live { border-color: var(--s3); color: #7fe0b8; }
+.pill.live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--s3); margin-right: 6px; animation: pulse 1.6s infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+canvas { display: block; }
+/* nav */
+#dots { position: fixed; right: 18px; top: 50%; transform: translateY(-50%); z-index: 20; display: flex; flex-direction: column; gap: 9px; }
+#dots a { width: 9px; height: 9px; border-radius: 50%; background: var(--axis); display: block; position: relative; }
+#dots a.on { background: var(--s1); transform: scale(1.35); }
+#dots a span { position: absolute; right: 18px; top: -6px; white-space: nowrap; font-size: 12px; background: var(--surface-2); padding: 2px 8px;
+  border-radius: 6px; color: var(--text-secondary); opacity: 0; pointer-events: none; transition: opacity .15s; }
+#dots a:hover span { opacity: 1; }
+#prog { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--s1), var(--s7)); z-index: 30; width: 0; }
+/* charts */
+.chart { width: 100%; position: relative; overflow: hidden; min-width: 0; }
+.chart svg { display: block; overflow: visible; }
+.chart text { fill: var(--text-muted); font-size: 12px; font-family: system-ui, sans-serif; }
+.chart .t2 { fill: var(--text-secondary); }
+.chart .t1 { fill: var(--text-primary); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-secondary); margin: 2px 0 8px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.legend i.sq { height: 10px; width: 10px; border-radius: 3px; }
+.tip { position: fixed; pointer-events: none; z-index: 50; background: #262624; border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font-size: 13px; color: var(--text-primary); box-shadow: 0 8px 24px rgba(0,0,0,.45); opacity: 0; transition: opacity .1s; max-width: 280px; }
+.tip .h { color: var(--text-secondary); font-size: 12px; margin-bottom: 3px; }
+.tip .r { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.tip .r i { width: 10px; height: 3px; border-radius: 2px; display: inline-block; }
+.tip .r b { margin-left: auto; padding-left: 12px; font-weight: 600; }
+/* tables */
+table.t { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.t th, table.t td { padding: 7px 10px; border-bottom: 1px solid var(--grid); text-align: left; }
+table.t th { color: var(--text-muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+table.t td.n { text-align: right; font-variant-numeric: tabular-nums; }
+table.t tr.hl td { color: var(--text-primary); background: rgba(57,135,229,.08); }
+table.t td.same { color: var(--text-muted); }
+details { margin-top: 10px; } summary { cursor: pointer; color: var(--text-muted); font-size: 13px; }
+/* slider */
+.ctl { display: flex; align-items: center; gap: 12px; margin: 8px 0; font-size: 14px; color: var(--text-secondary); flex-wrap: wrap; }
+input[type=range] { accent-color: var(--s4); width: 260px; }
+.readouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+.readouts div { background: var(--surface-2); border-radius: 10px; padding: 8px 12px; }
+.readouts b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+.readouts span { font-size: 12px; color: var(--text-muted); }
+/* method strip */
+.method canvas { width: 100%; aspect-ratio: 1; border-radius: 10px; image-rendering: pixelated; }
+.method h3 { margin-top: 12px; }
+.method p { font-size: 14px; color: var(--text-secondary); margin: 4px 0 0; }
+.method.dt { border-color: rgba(57,135,229,.55); box-shadow: 0 0 0 1px rgba(57,135,229,.25), 0 10px 40px rgba(57,135,229,.12); }
+/* loop */
+.loop svg text { font-family: system-ui, sans-serif; }
+.stage rect { fill: var(--surface-1); stroke: var(--axis); stroke-width: 1.5; transition: all .35s; }
+.stage.on rect { stroke: var(--s1); fill: #15243a; }
+.stage text { fill: var(--text-secondary); font-size: 14px; }
+.stage .tt { fill: var(--text-primary); font-weight: 600; font-size: 15px; }
+.group { font-size: 14px; }
+.group .row { display: grid; grid-template-columns: 90px 1fr 70px 80px; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--grid); }
+.group .bar { height: 8px; border-radius: 4px; background: var(--axis); position: relative; }
+.ok { color: #5fd38a; } .bad { color: var(--critical); }
+.footer { font-size: 13px; color: var(--text-muted); }
+.hint { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 13px; animation: bob 2s infinite; }
+@keyframes bob { 50% { transform: translate(-50%, 6px); } }
+#hero { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55; }
+.heroText { position: relative; z-index: 2; }
+.callout { border-left: 3px solid var(--s4); padding: 4px 0 4px 14px; color: var(--text-secondary); margin: 14px 0; }
+.callout b { color: var(--text-primary); }
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<nav id="dots"></nav>
+<div class="tip" id="tip"></div>
+
+<!-- 0. TITLE -->
+<section class="slide" id="s-title" data-title="Title">
+  <canvas id="hero"></canvas>
+  <div class="wrap heroText">
+    <div class="kicker">arXiv:2611.10866 · <b>reproduction on Qwen3.5-0.8B</b></div>
+    <h1>Teaching a language model<br>by <span class="grad">deleting</span> its weights</h1>
+    <p class="lead">Deletion Tuning post-trains an LLM without writing a single new number.
+      It learns <b>which</b> pretrained weights to set to zero. Under 0.05% of the model changes, and the whole adapter is a bitmask.</p>
+    <div class="grid4" style="margin-top:34px;max-width:980px">
+      <div class="stat"><div class="big">&lt;0.05%</div><div class="lbl">of weights zeroed (paper, all models)</div></div>
+      <div class="stat"><div class="big">1 bit</div><div class="lbl">per maskable weight: keep or delete</div></div>
+      <div class="stat"><div class="big">8.4 MB</div><div class="lbl">adapter vs 30.6 GB full fine-tune (Llama 8B)</div></div>
+      <div class="stat"><div class="big" id="heroOurs">+4.8 pts</div><div class="lbl" id="heroOursLbl">GSM8K in our run, by zeroing 0.024% of weights</div></div>
+    </div>
+  </div>
+  <div class="hint">scroll or press ↓</div>
+</section>
+
+<!-- 1. QUESTION -->
+<section class="slide" id="s-question" data-title="The question">
+  <div class="wrap">
+    <div class="kicker">01 · The question</div>
+    <h2>How little of a pretrained model has to change?</h2>
+    <p class="lead">Post-training methods differ in <b>what kind of edit</b> they make to a weight matrix.
+      Deletion Tuning goes furthest: it adds nothing and only removes.</p>
+    <div class="grid4" style="margin-top:26px">
+      <div class="card method"><canvas id="m-fft" width="20" height="20"></canvas><h3 style="color:var(--fft)">Full fine-tuning</h3><p>Every value moves a little. Checkpoint = a full copy of the model.</p></div>
+      <div class="card method"><canvas id="m-lora" width="20" height="20"></canvas><h3 style="color:var(--lora)">LoRA</h3><p>Adds a low-rank update <i>BA</i>. Rank capped at r; touches every entry.</p></div>
+      <div class="card method"><canvas id="m-mth" width="20" height="20"></canvas><h3 style="color:var(--mth)">Random sparse FT</h3><p>Rewrites a few values at randomly pre-chosen positions.</p></div>
+      <div class="card method dt"><canvas id="m-dt" width="20" height="20"></canvas><h3 style="color:#6fb0ff">Deletion Tuning</h3><p>Learns which few weights to <b>zero</b>. No new values are ever written.</p></div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-top:14px">Animated: each tile flips between the pretrained matrix and the edited matrix. Cell color is the weight value (blue negative, orange positive).</p>
+  </div>
+</section>
+
+<!-- 2. WHERE -->
+<section class="slide" id="s-where" data-title="Where the mask goes">
+  <div class="wrap cols w46">
+    <div>
+      <div class="kicker">02 · Where the mask goes</div>
+      <h2>Only the <span style="color:#6fb0ff">gate projection</span> of each MLP</h2>
+      <p class="sec">Modern LLMs use SwiGLU MLPs. The gate projection decides, per channel, how much of the
+        <code>up_proj</code> signal gets through to <code>down_proj</code>. It acts as a multiplicative switchboard, which makes it a natural place to cut wires.</p>
+      <ul class="clean">
+        <li><b>Frozen:</b> attention, embeddings, <code>up_proj</code>, <code>down_proj</code>, and the gate weight values themselves.</li>
+        <li><b>Trainable:</b> one logit <span style="color:#6fb0ff">G<sub>ij</sub></span> per gate weight.</li>
+        <li><b>In our model</b> (Qwen3.5-0.8B: 24 blocks, 18 Gated-DeltaNet + 6 full-attention):
+          24 × (3584 × 1024) = <b>88.1 M</b> maskable weights, which is <b>11.7%</b> of the 752 M text parameters.</li>
+      </ul>
+    </div>
+    <div class="card"><svg id="swiglu" viewBox="0 0 560 470" width="100%"></svg></div>
+  </div>
+</section>
+
+<!-- 3. MASK -->
+<section class="slide" id="s-mask" data-title="One logit per weight">
+  <div class="wrap cols w46">
+    <div>
+      <div class="kicker">03 · The parameterization</div>
+      <h2>One logit per weight, squeezed through a very steep sigmoid</h2>
+      <div class="formula">W̃ = W ⊙ σ(<span class="a">α(t)</span> · <span class="g">G</span>)</div>
+      <ul class="clean">
+        <li><b>Training</b> uses the soft mask above, so gradients reach <span style="color:#6fb0ff">G</span>.</li>
+        <li><b>Rollouts and eval</b> use the hard mask <code>W · 1[G &gt; 0]</code>, the thing you actually ship.</li>
+        <li><b><span style="color:var(--s4)">α</span> anneals 10³ → 10⁴</b> over training, so soft and hard masks converge.</li>
+        <li><b>Regularizer</b> −λ‖W̃‖² (λ = 10⁻⁵) rewards <i>keeping</i> weights, so a deletion has to pay for itself in reward.</li>
+      </ul>
+      <div class="callout">Drag α. With logits initialized at ±0.03, the sigmoid is already saturated at α = 1000.
+        <b>In fp32, σ′(z) underflows to exactly 0 for |z| ≳ 16.6</b>, so only logits inside a thin band around 0 receive any gradient.
+        AdamW rescales those tiny gradients into full-size steps. As α grows, the band narrows and the mask freezes in place.</div>
+    </div>
+    <div class="card">
+      <div class="ctl">α = <b id="aVal" class="mono" style="color:var(--s4);min-width:60px">1000</b>
+        <input type="range" id="aSlider" min="1" max="4" step="0.01" value="3">
+        <span class="muted">log scale, 10 → 10⁴</span></div>
+      <div class="chart" id="sigChart"></div>
+      <div class="readouts">
+        <div><b id="r1">1.000</b><span>soft mask at G = +0.03 (init "keep")</span></div>
+        <div><b id="r2">±0.017</b><span>gradient band |G| &lt; 16.6/α</span></div>
+        <div><b id="r3">9.0%</b><span>of init logits inside the band</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. WANDA INIT -->
+<section class="slide" id="s-wanda" data-title="Wanda prior">
+  <div class="wrap cols w55">
+    <div>
+      <div class="kicker">04 · Initialization</div>
+      <h2>Start from a pruning prior: Wanda</h2>
+      <p class="sec">Each weight gets an importance score from one calibration pass:</p>
+      <div class="formula" style="font-size:26px">s<sub>ij</sub> = |W<sub>ij</sub>| · ‖X<sub>j</sub>‖<sub>2</sub></div>
+      <p class="sec">The bottom <b>η = 1/2048</b> of each layer starts deleted (logit ≈ N(−0.03, 0.01²)), and everything else starts kept (≈ N(+0.03, 0.01²)).
+        Pruning by Wanda <i>alone</i> barely moves accuracy (within 2.4 pts of base in the paper), so the gains come from <b>learning</b> the mask, not from the initialization.</p>
+      <div class="card" style="margin-top:10px">
+        <h3>What we found in the init masks</h3>
+        <p class="sec" style="font-size:15px;margin:4px 0 10px">η/layer is only 1,792 weights, yet ~6,740 start deleted. The other ~4,950 come from the
+          <b>noise tail</b>: a kept logit N(+0.03, 0.01²) falls below 0 with p = Φ(−3) ≈ 0.135%. Together they reproduce the paper's "≈0.18%" figure.</p>
+        <div class="chart" id="initBar"></div>
+        <div class="cap" id="initCap"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Toy Wanda scoring</h3>
+      <div class="muted" style="font-size:13px">Weight magnitude × input-activation norm. Outlined cells have the lowest scores and start deleted. Hover a cell.</div>
+      <canvas id="wandaCv" style="width:100%;margin-top:10px;border-radius:8px"></canvas>
+      <div class="legend" style="margin-top:10px"><span><i class="sq" style="background:#3a3a37"></i>|W| (brighter = larger)</span><span><i class="sq" style="background:var(--s4)"></i>‖X<sub>j</sub>‖ per input column</span><span><i class="sq" style="background:transparent;border:2px solid var(--critical)"></i>initially deleted</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. GRPO -->
+<section class="slide" id="s-grpo" data-title="Training loop">
+  <div class="wrap">
+    <div class="kicker">05 · Reinforcement learning</div>
+    <h2>GRPO: sample with the hard mask, learn through the soft one</h2>
+    <div class="cols w55" style="align-items:start;margin-top:10px">
+      <div class="card loop"><svg id="loopSvg" viewBox="0 0 600 400" width="100%"></svg></div>
+      <div>
+        <div class="card group">
+          <h3>One prompt group (n = 4 rollouts)</h3>
+          <div class="muted" style="font-size:13px;margin-bottom:6px">Reward is 1 if the number after <code>####</code> matches the GSM8K answer. Advantage = (r − mean) / std within the group.</div>
+          <div id="groupRows"></div>
+          <div class="muted" style="font-size:13px;margin-top:8px" id="groupNote"></div>
+        </div>
+        <ul class="clean" style="font-size:15px">
+          <li><b>Fully on-policy:</b> one gradient step per batch, so the PPO ratio ≡ 1 and the clipped objective reduces to −A · log π. No KL term.</li>
+          <li><b>Per step:</b> 32 prompts × 4 rollouts, ≤ 768 new tokens, about 17 s on one RTX PRO 6000.</li>
+          <li><b>Only 88 M logits get gradients.</b> The optimizer is AdamW with lr 3·10⁻⁴, constant.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. PAPER RESULTS -->
+<section class="slide" id="s-paper" data-title="Paper: accuracy">
+  <div class="wrap">
+    <div class="kicker">06 · What the paper found</div>
+    <h2>Matches full fine-tuning at scale, with an adapter ~4,000× smaller</h2>
+    <p class="lead" style="font-size:17px">GRPO results (best-checkpoint validation accuracy). Llama models are trained and evaluated on GSM8K. Qwen2.5 models are trained on the SimpleRL-Zoo math data and scored as the mean of six math benchmarks.
+      The gap is largest on the smallest models, and Deletion Tuning <b>edges out FFT on the largest ones</b>.</p>
+    <div class="card" style="margin-top:14px">
+      <div class="legend" id="resLegend"></div>
+      <div class="chart" id="resChart"></div>
+      <details><summary>Table view</summary><div id="resTable"></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- 7. PAPER: SIZE, FORGETTING, GEOMETRY -->
+<section class="slide" id="s-paper2" data-title="Paper: size & forgetting">
+  <div class="wrap">
+    <div class="kicker">07 · Why it's interesting</div>
+    <h2>Tiny, barely forgets, and updates like FFT</h2>
+    <div class="grid3" style="margin-top:16px;align-items:stretch">
+      <div class="card"><h3>Adapter size · Llama 8B (log scale)</h3><div class="chart" id="sizeChart"></div>
+        <div class="cap">The mask compresses to ~0.03 bits per target weight (zstd), smaller even than LoRA rank 1.</div></div>
+      <div class="card"><h3>Forgetting · range across Llama 1B/3B/8B</h3><div class="chart" id="klChart"></div>
+        <div class="chart" id="dropChart" style="margin-top:6px"></div>
+        <div class="cap">Prior-task suite: HellaSwag, MMLU, TruthfulQA, WinoGrande, IFEval, HumanEval. MTH-99.95% trains a similar 0.05% of parameters, so a small edit count alone doesn't explain the retention.</div></div>
+      <div class="card"><h3>Update geometry · stable rank of ΔW</h3><div class="chart" id="geoChart"></div>
+        <div class="cap">LoRA is pinned at rank 1–2 and random-sparse updates are noise-like (410–650). Deletion Tuning lands in between, and its spectrum drift and principal-weight overlap track FFT most closely.</div></div>
+    </div>
+    <div class="grid4" style="margin-top:16px">
+      <div class="card stat"><div class="big" style="color:#6fb0ff">55.43</div><div class="lbl">Qwen2.5-14B DT (11.4 MB)<br><span class="muted">FFT 54.87 (56 GB)</span></div></div>
+      <div class="card stat"><div class="big" style="color:#6fb0ff">58.54</div><div class="lbl">Qwen3-30B-A3B DT (29.6 MB)<br><span class="muted">FFT 58.43 (116 GB)</span></div></div>
+      <div class="card stat"><div class="big">99.62</div><div class="lbl">pass@128, Llama 8B GSM8K<br><span class="muted">base 95.29, so it solves problems the base never solves</span></div></div>
+      <div class="card stat"><div class="big" style="font-size:34px">SFT + SDFT</div><div class="lbl">also works: MMLU-Pro 22.28 vs FFT 21.19 (3B)<br><span class="muted">ToolAlpaca 69.07 vs 68.04</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. OUR SETUP -->
+<section class="slide" id="s-setup" data-title="Our setup">
+  <div class="wrap cols w46">
+    <div>
+      <div class="kicker">08 · This experiment</div>
+      <h2>A one-GPU reproduction on a newer, smaller model</h2>
+      <p class="sec">Same algorithm, scaled to fit a single RTX PRO 6000 for ~80 minutes per run.
+        The base model is <b>Qwen3.5-0.8B</b> (hybrid Gated-DeltaNet / attention) in non-thinking chat mode, trained on GSM8K.</p>
+      <div class="card" style="margin-top:12px">
+        <div class="mono" style="font-size:13px;color:var(--text-secondary);line-height:1.8">
+          <span class="muted"># files</span><br>
+          deletion_tuning.py &nbsp;<span class="muted">MaskedLinear, Wanda init, α schedule, regularizer</span><br>
+          train_grpo.py &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="muted">GRPO loop, greedy eval, logging</span><br>
+          run.sh / Dockerfile <span class="muted">GPU container</span><br>
+          dashboard/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="muted">live training monitor</span><br>
+          site/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="muted">this presentation</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <table class="t">
+        <thead><tr><th>Setting</th><th>Paper</th><th>Ours</th></tr></thead>
+        <tbody>
+          <tr><td>Masked modules</td><td>gate_proj</td><td class="same">same</td></tr>
+          <tr><td>α schedule</td><td>10³ → 10⁴ linear</td><td class="same">same</td></tr>
+          <tr><td>LR / optimizer</td><td>3·10⁻⁴ AdamW const</td><td class="same">same</td></tr>
+          <tr><td>λ (norm reg.)</td><td>10⁻⁵</td><td class="same">same</td></tr>
+          <tr><td>Wanda η</td><td>1/2048</td><td class="same">same</td></tr>
+          <tr><td>Rollouts / prompt, KL</td><td>4, none</td><td class="same">same</td></tr>
+          <tr class="hl"><td>Prompt batch</td><td>64</td><td>32</td></tr>
+          <tr class="hl"><td>Max response</td><td>4096 tok</td><td>768 tok</td></tr>
+          <tr class="hl"><td>Wanda calibration</td><td>2048 prompts</td><td>512 prompts</td></tr>
+          <tr class="hl"><td>Training length</td><td>≈3 epochs</td><td>200 steps (6,400 prompts)</td></tr>
+          <tr class="hl"><td>Eval</td><td>full val set</td><td>first 500 GSM8K test, greedy</td></tr>
+          <tr class="hl"><td>Model</td><td>Llama 3.x / Qwen2.5</td><td>Qwen3.5-0.8B</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 9. OUR RESULTS -->
+<section class="slide" id="s-results" data-title="Our results">
+  <div class="wrap">
+    <div class="kicker">09 · Results so far <span class="pill live" id="livePill">runs in progress</span></div>
+    <h2 id="resH">GSM8K accuracy climbs while the mask barely changes</h2>
+    <div class="grid4" id="ourTiles" style="margin:16px 0"></div>
+    <div class="grid2">
+      <div class="card"><h3>Greedy GSM8K test accuracy (500 problems)</h3><div class="legend" id="accLegend"></div><div class="chart" id="accChart"></div>
+        <div class="cap">The shaded band is ±1 binomial standard error (≈ ±2.2 pts at 500 problems) around the seed-0 run.</div></div>
+      <div class="card"><h3>Training reward (rolling mean of 10 steps)</h3><div class="legend" id="rewLegend"></div><div class="chart" id="rewChart"></div>
+        <div class="cap">The fraction of 128 sampled rollouts per step that reach the right answer.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. MASK DYNAMICS -->
+<section class="slide" id="s-dyn" data-title="Mask dynamics">
+  <div class="wrap">
+    <div class="kicker">10 · Inside the mask</div>
+    <h2>Deletions happen early, then α freezes the mask</h2>
+    <div class="grid3" style="margin-top:14px">
+      <div class="card"><h3>Deleted gate weights (% of gate_proj)</h3><div class="legend" id="delLegend"></div><div class="chart" id="delChart"></div>
+        <div class="cap" id="delCap"></div></div>
+      <div class="card"><h3>Gradient band half-width 16.6/α</h3><div class="chart" id="bandChart"></div>
+        <div class="cap">The band shrinks tenfold as α ramps from 10³ to 10⁴. Logits outside it get exactly zero gradient, which is consistent with the plateau on the left.</div></div>
+      <div class="card"><h3>Mean response length (tokens)</h3><div class="legend" id="lenLegend"></div><div class="chart" id="lenChart"></div>
+        <div class="cap">Responses get ~10–15% shorter early in training, as the policy learns to reach <code>####</code> sooner.</div></div>
+    </div>
+    <div class="cols w55" style="margin-top:18px;align-items:stretch">
+      <div class="card"><h3>Where the learned deletions land, per block</h3>
+        <div class="legend"><span><i class="sq" style="background:var(--s1)"></i>extra deletions in trained mask (seed 0, best ckpt) vs mean init</span><span><i class="sq" style="background:var(--s7)"></i>block with full attention</span></div>
+        <div class="chart" id="layerChart"></div>
+        <div class="cap">Estimate: trained count minus the mean per-layer init count across seeds 1–3, since the seed-0 init mask wasn't saved. Earlier blocks pick up roughly twice as many new deletions as the last ones.</div></div>
+      <div class="card"><h3>Overlap between masks</h3><div id="overlapBox"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. CAVEATS / NEXT -->
+<section class="slide" id="s-next" data-title="Caveats & next">
+  <div class="wrap cols">
+    <div>
+      <div class="kicker">11 · Honest caveats</div>
+      <h2>What this does <i>not</i> show yet</h2>
+      <ul class="clean">
+        <li><b>One main run (seed 0).</b> +4.8 pts is about 2 standard errors at n = 500, and "best" is the max over 8 evals, which biases it upward. Seeds 1–3 are running now.</li>
+        <li><b>The start point already shifts.</b> Different Wanda/noise masks alone give step-0 accuracies from 54.4% to 55.8%.</li>
+        <li><b>No baselines yet.</b> Without FFT, LoRA, or random-sparse under the same budget, we can't say whether deletion is <i>competitive</i> here, only that it learns.</li>
+        <li><b>No retention suite.</b> The paper's headline (no forgetting) is untested on this model.</li>
+        <li><b>Shorter rollouts</b> (768 vs 4096 tokens) and a strong instruct base (54% at step 0, vs Llama 1B at 1.2%) leave less headroom.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="kicker">12 · Next steps</div>
+      <h2>Where to take it</h2>
+      <div class="grid2">
+        <div class="card"><h3>Baselines</h3><p class="sec" style="font-size:14px;margin:0">FFT (lr 10⁻⁶), LoRA r=1/4, and MTH-99.95% with identical rollouts and budget.</p></div>
+        <div class="card"><h3>Forgetting</h3><p class="sec" style="font-size:14px;margin:0">Forward KL on GSM8K, plus a retention suite (MMLU, HellaSwag, IFEval…).</p></div>
+        <div class="card"><h3>Init ablation</h3><p class="sec" style="font-size:14px;margin:0">Remove the noise tail (σ = 0) to separate Wanda deletions from random ones.</p></div>
+        <div class="card"><h3>α / band</h3><p class="sec" style="font-size:14px;margin:0">Since the mask freezes by ~step 75, try a slower α ramp or smaller init |G| to keep more logits trainable.</p></div>
+        <div class="card"><h3>Mask arithmetic</h3><p class="sec" style="font-size:14px;margin:0">Union or intersect masks from different tasks or seeds (the paper lists merging as future work).</p></div>
+        <div class="card"><h3>Full GSM8K</h3><p class="sec" style="font-size:14px;margin:0">Score all 1,319 test problems and report the final checkpoint alongside the best one.</p></div>
+      </div>
+      <p class="footer" style="margin-top:22px">Paper: J. Lu, Z. Yang, M. Lasby, T. Pote, Y. Ioannou, M. Ren, <i>The Surprising Effectiveness of Deleting Weights in LLM Post-Training</i>,
+        <a href="https://arxiv.org/abs/2611.10866">arXiv:2611.10866</a> (CC BY 4.0). Paper numbers are quoted from its tables; experiment data are from <code>runs/*/log.jsonl</code> and <code>best_mask.pt</code>.
+        <br><span id="builtAt"></span></p>
+    </div>
+  </div>
+</section>
+
+<script src="data.js"></script>
+<script>
+// ?only=<slide-id> shows a single slide (handy for screenshots / embedding)
+const _only = new URLSearchParams(location.search).get('only');
+if (_only) document.querySelectorAll('.slide').forEach(s => { if (s.id !== _only) s.style.display = 'none'; });
+</script>
+<script>
+"use strict";
+const D = window.DT_DATA || { runs: {}, masks: {} };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = { dt: css('--s1'), fft: css('--s2'), lora: css('--s3'), mth: css('--s4'), base: css('--base'), s5: css('--s5'), s7: css('--s7'),
+  grid: css('--grid'), axis: css('--axis'), muted: css('--text-muted'), surf: css('--surface-1'), crit: css('--critical') };
+const RUNCOL = { dt_gsm8k: C.dt, dt_seed1: C.fft, dt_seed2: C.lora, dt_seed3: C.mth };
+const RUNNAME = { dt_gsm8k: 'seed 0', dt_seed1: 'seed 1', dt_seed2: 'seed 2', dt_seed3: 'seed 3' };
+const NS = 'http://www.w3.org/2000/svg';
+const fmtPct = (v, d = 1) => (v * 100).toFixed(d) + '%';
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById('tip');
+function showTip(html, ev) {
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if (x + w > innerWidth - 8) x = ev.clientX - w - 14;
+  if (y + h > innerHeight - 8) y = ev.clientY - h - 14;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+const hideTip = () => tip.style.opacity = 0;
+const row = (col, name, val) => `<div class="r"><i style="background:${col}"></i>${name}<b>${val}</b></div>`;
+
+/* ---------- svg helpers ---------- */
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(parent, x, y, s, attrs = {}) { const t = el('text', { x, y, ...attrs }, parent); t.textContent = s; return t; }
+function niceTicks(lo, hi, n = 5) {
+  const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n) || 10 * mag;
+  const out = []; for (let v = Math.ceil(lo / step - 1e-9) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+function legend(id, items, sq) {
+  const L = document.getElementById(id); if (!L) return;
+  L.innerHTML = items.map(([n, c]) => `<span><i class="${sq ? 'sq' : ''}" style="background:${c}"></i>${n}</span>`).join('');
+}
+const charts = [];
+function chart(id, fn) {
+  const c = document.getElementById(id); if (!c) return;
+  let lastW = 0;
+  const r = () => { const w = c.clientWidth; if (!w) return; lastW = w; c.innerHTML = ''; fn(c, w); };
+  charts.push(r); r();
+  new ResizeObserver(() => { if (c.clientWidth && Math.abs(c.clientWidth - lastW) > 2) r(); }).observe(c);
+}
+addEventListener('resize', () => { clearTimeout(window._rz); window._rz = setTimeout(() => charts.forEach(f => f()), 120); });
+
+/* Line chart. series: [{name,color,pts:[[x,y]],dash,width,area}] */
+function lineChart(c, W, o) {
+  const H = o.height || 260, m = { l: 46, r: o.mr || 14, t: 10, b: 34 };
+  const svg = el('svg', { width: W, height: H }, c);
+  const all = o.series.flatMap(s => s.pts);
+  if (!all.length) { txt(svg, W / 2, H / 2, 'no data yet', { 'text-anchor': 'middle' }); return; }
+  const xd = o.xDomain || [Math.min(...all.map(p => p[0])), Math.max(...all.map(p => p[0]))];
+  let yd = o.yDomain || [Math.min(...all.map(p => p[1])), Math.max(...all.map(p => p[1]))];
+  if (!o.yDomain) { const pad = (yd[1] - yd[0]) * 0.12 || 0.01; yd = [yd[0] - pad, yd[1] + pad]; }
+  const X = v => m.l + (v - xd[0]) / (xd[1] - xd[0] || 1) * (W - m.l - m.r);
+  const Y = v => H - m.b - (v - yd[0]) / (yd[1] - yd[0]) * (H - m.t - m.b);
+  for (const t of niceTicks(yd[0], yd[1], 5)) {
+    if (t < yd[0] || t > yd[1]) continue;
+    el('line', { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), stroke: C.grid }, svg);
+    txt(svg, m.l - 8, Y(t) + 4, o.yFmt ? o.yFmt(t) : t, { 'text-anchor': 'end' });
+  }
+  for (const t of niceTicks(xd[0], xd[1], 6)) txt(svg, X(t), H - m.b + 18, o.xFmt ? o.xFmt(t) : t, { 'text-anchor': 'middle' });
+  el('line', { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, stroke: C.axis }, svg);
+  if (o.xLabel) txt(svg, W - m.r, H - 2, o.xLabel, { 'text-anchor': 'end' });
+  if (o.bands) for (const b of o.bands) {
+    const d = b.pts.map((p, i) => `${i ? 'L' : 'M'}${X(p[0])},${Y(p[1])}`).join('') + b.pts.slice().reverse().map(p => `L${X(p[0])},${Y(p[2])}`).join('') + 'Z';
+    el('path', { d, fill: b.color, opacity: .14 }, svg);
+  }
+  if (o.vlines) for (const v of o.vlines) { el('line', { x1: X(v.x), x2: X(v.x), y1: m.t, y2: H - m.b, stroke: C.axis, 'stroke-dasharray': '3 4' }, svg); txt(svg, X(v.x) + 5, m.t + 12, v.label); }
+  for (const s of o.series) {
+    if (!s.pts.length) continue;
+    const d = s.pts.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
+    el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': s.width || 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', 'stroke-dasharray': s.dash || '' }, svg);
+    if (s.marker) for (const p of s.pts) el('circle', { cx: X(p[0]), cy: Y(p[1]), r: 4, fill: s.color, stroke: C.surf, 'stroke-width': 2 }, svg);
+    if (s.label) { const p = s.pts[s.pts.length - 1]; txt(svg, X(p[0]) + 8, Y(p[1]) + 4, s.label, { class: 't2' }); }
+  }
+  // hover
+  const cross = el('line', { y1: m.t, y2: H - m.b, stroke: C.muted, 'stroke-width': 1, opacity: 0 }, svg);
+  const dots = o.series.map(s => el('circle', { r: 5, fill: s.color, stroke: C.surf, 'stroke-width': 2, opacity: 0 }, svg));
+  const hit = el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }, svg);
+  hit.addEventListener('mousemove', ev => {
+    const r = svg.getBoundingClientRect(), xv = xd[0] + (ev.clientX - r.left - m.l) / (W - m.l - m.r) * (xd[1] - xd[0]);
+    let html = '', hx = null;
+    o.series.forEach((s, i) => {
+      if (!s.pts.length || s.noTip) { dots[i].setAttribute('opacity', 0); return; }
+      let best = s.pts[0]; for (const p of s.pts) if (Math.abs(p[0] - xv) < Math.abs(best[0] - xv)) best = p;
+      if (Math.abs(best[0] - xv) > (xd[1] - xd[0]) * 0.08) { dots[i].setAttribute('opacity', 0); return; }
+      dots[i].setAttribute('cx', X(best[0])); dots[i].setAttribute('cy', Y(best[1])); dots[i].setAttribute('opacity', 1);
+      hx = best[0]; html += row(s.color, s.name, o.tipFmt ? o.tipFmt(best[1]) : (o.yFmt ? o.yFmt(best[1]) : best[1]));
+    });
+    if (hx === null) { hideTip(); cross.setAttribute('opacity', 0); return; }
+    cross.setAttribute('x1', X(hx)); cross.setAttribute('x2', X(hx)); cross.setAttribute('opacity', .6);
+    showTip(`<div class="h">${o.xName || 'step'} ${o.xFmt ? o.xFmt(hx) : hx}</div>` + html, ev);
+  });
+  hit.addEventListener('mouseleave', () => { hideTip(); cross.setAttribute('opacity', 0); dots.forEach(d => d.setAttribute('opacity', 0)); });
+  return { svg, X, Y };
+}
+
+/* ---------- 0. hero canvas ---------- */
+(function hero() {
+  const cv = document.getElementById('hero'), ctx = cv.getContext('2d');
+  let cols, rows, cell, vals, dead, flash;
+  function init() {
+    const dpr = devicePixelRatio || 1; cv.width = cv.clientWidth * dpr; cv.height = cv.clientHeight * dpr;
+    cell = 14 * dpr; cols = Math.ceil(cv.width / cell); rows = Math.ceil(cv.height / cell);
+    vals = Float32Array.from({ length: cols * rows }, () => { const u = Math.random() + Math.random() + Math.random() - 1.5; return u / 1.5; });
+    dead = new Uint8Array(cols * rows); flash = new Float32Array(cols * rows);
+  }
+  function col(v, a) { return v < 0 ? `rgba(57,135,229,${a * -v})` : `rgba(217,89,38,${a * v})`; }
+  function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (let i = 0; i < vals.length; i++) {
+      const x = (i % cols) * cell, y = Math.floor(i / cols) * cell;
+      if (dead[i]) {
+        ctx.fillStyle = '#000'; ctx.fillRect(x + 1, y + 1, cell - 2, cell - 2);
+        if (flash[i] > 0) { ctx.strokeStyle = `rgba(111,176,255,${flash[i]})`; ctx.lineWidth = 2; ctx.strokeRect(x + 1, y + 1, cell - 2, cell - 2); flash[i] -= 0.02; }
+      } else { ctx.fillStyle = col(vals[i], .55); ctx.fillRect(x + 1, y + 1, cell - 2, cell - 2); }
+    }
+    // left-side fade for legibility
+    const g = ctx.createLinearGradient(0, 0, cv.width * .75, 0);
+    g.addColorStop(0, 'rgba(13,13,13,0.96)'); g.addColorStop(.55, 'rgba(13,13,13,0.75)'); g.addColorStop(1, 'rgba(13,13,13,0.15)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, cv.width, cv.height);
+  }
+  init(); draw();
+  if (reduceMotion) { for (let k = 0; k < vals.length * .01; k++) dead[(Math.random() * vals.length) | 0] = 1; draw(); return; }
+  let t = 0;
+  (function loop() {
+    t++;
+    if (t % 4 === 0) { const i = (Math.random() * vals.length) | 0; dead[i] = 1; flash[i] = 1; }
+    if (t % 900 === 0) dead.fill(0);
+    draw(); requestAnimationFrame(loop);
+  })();
+  addEventListener('resize', () => { init(); draw(); });
+})();
+
+/* ---------- 1. method tiles ---------- */
+(function methods() {
+  const N = 20, rnd = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(7);
+  const gauss = () => { let u = 0; for (let k = 0; k < 6; k++) u += rnd(); return (u - 3) / 1.2; };
+  const W = Array.from({ length: N * N }, gauss);
+  const u = Array.from({ length: N }, gauss), v = Array.from({ length: N }, gauss);
+  const pick = k => { const s = new Set(); while (s.size < k) s.add((rnd() * N * N) | 0); return s; };
+  const mthIdx = pick(9), dtIdx = new Set([...W.keys()].sort((a, b) => Math.abs(W[a]) - Math.abs(W[b])).slice(0, 3).concat([...pick(5)]));
+  const edits = {
+    'm-fft': i => W[i] + gauss() * .35,
+    'm-lora': i => W[i] + u[(i / N) | 0] * v[i % N] * .45,
+    'm-mth': i => mthIdx.has(i) ? W[i] + gauss() * 1.4 : W[i],
+    'm-dt': i => dtIdx.has(i) ? null : W[i],
+  };
+  const color = x => {
+    if (x === null) return '#000';
+    const a = Math.min(1, Math.abs(x) / 1.8);
+    const [r, g, b] = x < 0 ? [57, 135, 229] : [217, 89, 38];
+    const bg = [34, 34, 32];
+    return `rgb(${bg[0] + (r - bg[0]) * a | 0},${bg[1] + (g - bg[1]) * a | 0},${bg[2] + (b - bg[2]) * a | 0})`;
+  };
+  const tiles = Object.entries(edits).map(([id, f]) => { const cv = document.getElementById(id); cv.width = N * 12; cv.height = N * 12; return { ctx: cv.getContext('2d'), f, id }; });
+  function draw(mix) {
+    for (const { ctx, f, id } of tiles) {
+      for (let i = 0; i < N * N; i++) {
+        const e = f(i); let val;
+        if (e === null) val = mix > .5 ? null : W[i]; else val = W[i] + (e - W[i]) * mix;
+        ctx.fillStyle = color(val); ctx.fillRect((i % N) * 12 + 1, ((i / N) | 0) * 12 + 1, 10, 10);
+        const changed = id !== 'm-fft' && id !== 'm-lora' && e !== W[i];
+        if (changed && mix > .5) { ctx.strokeStyle = id === 'm-dt' ? '#6fb0ff' : '#f0c060'; ctx.lineWidth = 1.5; ctx.strokeRect((i % N) * 12 + 1.5, ((i / N) | 0) * 12 + 1.5, 9, 9); }
+      }
+    }
+  }
+  if (reduceMotion) { draw(1); return; }
+  let t0 = performance.now();
+  (function loop(now) {
+    const ph = ((now - t0) / 4200) % 1; // 0..1
+    const mix = ph < .35 ? 0 : ph < .5 ? (ph - .35) / .15 : ph < .85 ? 1 : 1 - (ph - .85) / .15;
+    draw(Math.max(0, Math.min(1, mix))); requestAnimationFrame(loop);
+  })(t0);
+})();
+
+/* ---------- 2. SwiGLU diagram ---------- */
+(function swiglu() {
+  const s = document.getElementById('swiglu');
+  const box = (x, y, w, h, label, sub, hl) => {
+    const g = el('g', {}, s);
+    el('rect', { x, y, width: w, height: h, rx: 10, fill: hl ? '#15243a' : C.surf, stroke: hl ? C.dt : C.axis, 'stroke-width': hl ? 2.5 : 1.5 }, g);
+    txt(g, x + w / 2, y + h / 2 + (sub ? -2 : 5), label, { 'text-anchor': 'middle', fill: hl ? '#cfe3ff' : '#f0efec', 'font-size': 15, 'font-weight': 600 });
+    if (sub) txt(g, x + w / 2, y + h / 2 + 16, sub, { 'text-anchor': 'middle', fill: C.muted, 'font-size': 12 });
+    return g;
+  };
+  const defs = el('defs', {}, s);
+  const mk = el('marker', { id: 'arr', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' }, defs);
+  el('path', { d: 'M0,0L10,5L0,10z', fill: C.muted }, mk);
+  const arrow = (d) => el('path', { d, fill: 'none', stroke: C.muted, 'stroke-width': 1.6, 'marker-end': 'url(#arr)' }, s);
+  // flow bottom→top
+  box(200, 410, 160, 44, 'x  (1024)', null);
+  arrow('M280,410 L280,385 L130,385 L130,350'); arrow('M280,385 L430,385 L430,350');
+  const gate = box(40, 284, 180, 64, 'gate_proj', '3584 × 1024 · masked', true);
+  box(340, 284, 180, 64, 'up_proj', '3584 × 1024 · frozen');
+  arrow('M130,284 L130,250'); box(80, 206, 100, 42, 'SiLU', null);
+  arrow('M130,206 L130,175 L252,175'); arrow('M430,284 L430,175 L308,175');
+  el('circle', { cx: 280, cy: 175, r: 24, fill: C.surf, stroke: C.axis, 'stroke-width': 1.5 }, s);
+  txt(s, 280, 182, '⊙', { 'text-anchor': 'middle', fill: '#f0efec', 'font-size': 22 });
+  arrow('M280,151 L280,112'); box(190, 66, 180, 44, 'down_proj', '1024 × 3584 · frozen');
+  arrow('M280,66 L280,30'); txt(s, 280, 20, 'MLP output', { 'text-anchor': 'middle', fill: C.muted, 'font-size': 13 });
+  // annotation
+  txt(s, 40, 268, 'channel-wise switchboard', { fill: '#6fb0ff', 'font-size': 12 });
+  // mini 1-bit mask grid between gate_proj and up_proj
+  const mg = [];
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 9; c++) mg.push(el('rect', { x: 236 + c * 10, y: 290 + r * 10, width: 8, height: 8, rx: 1.5, fill: '#2b4a74' }, s));
+  txt(s, 280, 356, 'mask G > 0', { 'text-anchor': 'middle', fill: '#6fb0ff', 'font-size': 11 });
+  el('path', { d: 'M232,316 L222,316', stroke: '#6fb0ff', 'stroke-width': 1.5, 'stroke-dasharray': '3 3' }, s);
+  const dead = new Set([7, 22, 31]); mg.forEach((r, i) => dead.has(i) && r.setAttribute('fill', '#000'));
+  if (!reduceMotion) setInterval(() => { const i = (Math.random() * mg.length) | 0; if (Math.random() < .5) { dead.add(i); mg[i].setAttribute('fill', '#000'); } else if (dead.size > 2) { const j = [...dead][0]; dead.delete(j); mg[j].setAttribute('fill', '#2b4a74'); } }, 700);
+  txt(s, 545, 455, '× 24 blocks', { 'text-anchor': 'end', fill: C.muted, 'font-size': 12 });
+})();
+
+/* ---------- 3. sigmoid slider ---------- */
+(function sigmoid() {
+  const sl = document.getElementById('aSlider');
+  const Phi = z => .5 * (1 + erf(z / Math.SQRT2));
+  function erf(x) { const t = 1 / (1 + .3275911 * Math.abs(x)); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - .284496736) * t + .254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; }
+  const sig = z => 1 / (1 + Math.exp(-z));
+  function render() {
+    const a = Math.pow(10, +sl.value), band = 16.6 / a;
+    document.getElementById('aVal').textContent = a < 100 ? a.toFixed(1) : Math.round(a).toLocaleString();
+    document.getElementById('r1').textContent = sig(a * .03).toFixed(6).replace(/0+$/, '0');
+    document.getElementById('r2').textContent = '±' + (band >= .01 ? band.toFixed(3) : band.toExponential(1));
+    const frac = Math.min(1, Phi((band - .03) / .01) - Phi((-band - .03) / .01));
+    document.getElementById('r3').textContent = frac > .999 ? '100%' : frac >= .01 ? (frac * 100).toFixed(1) + '%' : (frac * 100).toFixed(2) + '%';
+    const c = document.getElementById('sigChart'); if (!c.clientWidth) return; c.innerHTML = '';
+    const pts = []; for (let i = 0; i <= 400; i++) { const x = -.06 + i * .12 / 400; pts.push([x, sig(a * x)]); }
+    const dens = []; for (let i = 0; i <= 200; i++) { const x = -.06 + i * .12 / 200; dens.push([x, Math.exp(-((x - .03) ** 2) / (2e-4)) * .55]); }
+    const lo = Math.max(-.06, -band), hi = Math.min(.06, band);
+    const r = lineChart(c, c.clientWidth, {
+      height: 270, xDomain: [-.06, .06], yDomain: [0, 1.05], xName: 'G =', xFmt: v => (+v).toFixed(2), xLabel: 'logit G', tipFmt: v => v.toFixed(4),
+      bands: [{ color: C.mth, pts: [[lo, 1.05, 0], [hi, 1.05, 0]] }],
+      series: [{ name: 'σ(αG)', color: C.mth, pts, width: 2.5 },
+               { name: 'init logit density (kept)', color: C.dt, pts: dens, dash: '4 4', noTip: true }],
+    });
+    txt(r.svg, r.X(.03), r.Y(.6), 'kept logits ~N(0.03, 0.01²)', { 'text-anchor': 'middle', fill: '#6fb0ff' });
+    txt(r.svg, r.X(-.03), r.Y(.08), 'deleted ~N(−0.03, 0.01²)', { 'text-anchor': 'middle', fill: '#6fb0ff' });
+    el('line', { x1: r.X(-.03), x2: r.X(-.03), y1: r.Y(0), y2: r.Y(.03), stroke: C.dt, 'stroke-width': 3 }, r.svg);
+    if (band < .06) txt(r.svg, r.X(0), 22, 'gradient band', { 'text-anchor': 'middle', fill: '#f0c060' });
+  }
+  sl.addEventListener('input', render); charts.push(render); render();
+})();
+
+/* ---------- 4. Wanda ---------- */
+(function wanda() {
+  const cv = document.getElementById('wandaCv'), R = 12, Cc = 24, K = 6;
+  const rnd = (s => () => (s = (s * 48271) % 2147483647) / 2147483647)(11);
+  const g = () => { let u = 0; for (let k = 0; k < 6; k++) u += rnd(); return (u - 3) / 1.2; };
+  const Wm = Array.from({ length: R * Cc }, () => Math.abs(g()));
+  const Xn = Array.from({ length: Cc }, () => .25 + Math.exp(g() * .7));
+  const S = Wm.map((w, i) => w * Xn[i % Cc]);
+  const thr = [...S].sort((a, b) => a - b)[K - 1];
+  let geo;
+  function draw() {
+    if (!cv.clientWidth) return;
+    const dpr = devicePixelRatio || 1, Wd = cv.clientWidth, cell = Wd / Cc, top = cell * 3.2, Hd = top + cell * R;
+    cv.style.height = Hd + 'px'; cv.width = Wd * dpr; cv.height = Hd * dpr;
+    const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+    const xmax = Math.max(...Xn), wmax = Math.max(...Wm);
+    for (let j = 0; j < Cc; j++) { const h = Xn[j] / xmax * (top - 8); ctx.fillStyle = C.mth; ctx.beginPath(); ctx.roundRect(j * cell + 2, top - 4 - h, cell - 4, h, [3, 3, 0, 0]); ctx.fill(); }
+    for (let i = 0; i < R * Cc; i++) {
+      const r = (i / Cc) | 0, c = i % Cc, a = Wm[i] / wmax, v = 40 + a * 190 | 0;
+      ctx.fillStyle = `rgb(${v},${v},${v * .97 | 0})`; ctx.fillRect(c * cell + 1, top + r * cell + 1, cell - 2, cell - 2);
+      if (S[i] <= thr) { ctx.strokeStyle = C.crit; ctx.lineWidth = 2.5; ctx.strokeRect(c * cell + 2, top + r * cell + 2, cell - 4, cell - 4); }
+    }
+    geo = { cell, top };
+  }
+  cv.addEventListener('mousemove', ev => {
+    const r = cv.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+    const c = Math.floor(x / geo.cell), rr = Math.floor((y - geo.top) / geo.cell);
+    if (c < 0 || c >= Cc) return hideTip();
+    if (rr < 0) return showTip(`<div class="h">input column ${c}</div>` + row(C.mth, '‖X<sub>j</sub>‖', Xn[c].toFixed(2)), ev);
+    if (rr >= R) return hideTip();
+    const i = rr * Cc + c;
+    showTip(`<div class="h">w[${rr},${c}]</div>` + row('#aaa', '|W|', Wm[i].toFixed(2)) + row(C.mth, '‖X‖', Xn[c].toFixed(2)) + row(S[i] <= thr ? C.crit : C.dt, 'score', S[i].toFixed(2)) + (S[i] <= thr ? '<div class="h" style="margin-top:4px;color:#e66767">bottom-η → starts deleted</div>' : ''), ev);
+  });
+  cv.addEventListener('mouseleave', hideTip);
+  draw(); charts.push(draw);
+
+  // init composition bar
+  const M = D.masks && D.masks.runs, perLayer = 3584 * 1024, wandaK = Math.floor(perLayer / 2048);
+  const seeds = ['dt_seed1', 'dt_seed2', 'dt_seed3'].filter(s => M && M[s]);
+  const initMean = seeds.length ? seeds.reduce((a, s) => a + M[s].total, 0) / seeds.length / 24 : 6740;
+  chart('initBar', (c, W) => {
+    const H = 64, svg = el('svg', { width: W, height: H }, c), tot = initMean, X = v => v / tot * (W - 2);
+    const parts = [['Wanda bottom-η', wandaK, C.mth], ['noise tail crossing 0', tot - wandaK, C.s7]];
+    let x0 = 0;
+    parts.forEach(([n, v, col], i) => {
+      const w = X(v) - (i < parts.length - 1 ? 2 : 0);
+      const r = el('rect', { x: x0, y: 8, width: w, height: 26, rx: 4, fill: col }, svg);
+      txt(svg, i ? W - 2 : 0, 54, `${n}: ${Math.round(v).toLocaleString()}`, { class: 't2', 'text-anchor': i ? 'end' : 'start' });
+      r.addEventListener('mousemove', ev => showTip(`<div class="h">deleted at init, per layer</div>` + row(col, n, Math.round(v).toLocaleString() + ` (${(v / perLayer * 100).toFixed(3)}%)`), ev));
+      r.addEventListener('mouseleave', hideTip);
+      x0 += X(v);
+    });
+  });
+  if (D.masks && D.masks.intersect && seeds.length >= 2) {
+    const k = Object.keys(D.masks.intersect).filter(k => !k.includes('dt_gsm8k'));
+    const shared = k.reduce((a, kk) => a + D.masks.intersect[kk], 0) / k.length / 24;
+    const jac = k.reduce((a, kk) => a + D.masks.overlap[kk], 0) / k.length;
+    document.getElementById('initCap').innerHTML = `Mean over ${seeds.length} seeds' init masks (${Math.round(initMean).toLocaleString()} per layer). Two seeds share only <b>${Math.round(shared).toLocaleString()}</b> deletions per layer (Jaccard ${(jac * 100).toFixed(0)}%). That is almost exactly the Wanda set (${wandaK.toLocaleString()}), so the noise-tail deletions are effectively random.`;
+  }
+})();
+
+/* ---------- 5. GRPO loop ---------- */
+(function loop() {
+  const s = document.getElementById('loopSvg');
+  const defs = el('defs', {}, s);
+  const mk = el('marker', { id: 'arr2', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' }, defs);
+  el('path', { d: 'M0,0L10,5L0,10z', fill: C.muted }, mk);
+  const st = [
+    [20, 20, 'Sample 32 prompts', 'from GSM8K train'],
+    [320, 20, 'Roll out × 4', 'hard mask · W·1[G>0] · T=1'],
+    [320, 150, 'Score', 'reward ∈ {0,1}'],
+    [320, 280, 'Group advantages', 'A = (r − r̄) / σ_group'],
+    [20, 280, 'Policy gradient', 'soft mask · −A·log π − λ‖W̃‖²'],
+    [20, 150, 'AdamW on G only', 'α(t) ↑ · 88 M logits'],
+  ];
+  const gs = st.map(([x, y, t, sub]) => {
+    const g = el('g', { class: 'stage' }, s);
+    el('rect', { x, y, width: 260, height: 92, rx: 12 }, g);
+    txt(g, x + 18, y + 38, t, { class: 'tt' }); txt(g, x + 18, y + 64, sub);
+    return g;
+  });
+  const A = d => el('path', { d, fill: 'none', stroke: C.muted, 'stroke-width': 1.6, 'marker-end': 'url(#arr2)' }, s);
+  A('M280,66 L316,66'); A('M450,112 L450,146'); A('M450,242 L450,276'); A('M320,326 L284,326'); A('M150,280 L150,246'); A('M150,150 L150,116');
+  const pulse = el('circle', { r: 6, fill: C.dt }, s);
+  const path = [[280, 66], [320, 66], [450, 112], [450, 150], [450, 242], [450, 280], [320, 326], [280, 326], [150, 280], [150, 246], [150, 150], [150, 112]];
+  let k = 0;
+  function tick() {
+    gs.forEach((g, i) => g.classList.toggle('on', i === k));
+    const [x, y] = path[2 * k + 1] || path[0]; pulse.setAttribute('cx', x); pulse.setAttribute('cy', y);
+    k = (k + 1) % gs.length;
+  }
+  tick(); if (!reduceMotion) setInterval(tick, 1400);
+
+  // group example — cycles through a few reward patterns
+  const pats = [[1, 0, 1, 0], [1, 1, 1, 0], [0, 0, 0, 1], [1, 1, 1, 1]];
+  let p = 0;
+  function group() {
+    const r = pats[p], m = r.reduce((a, b) => a + b) / 4, sd = Math.sqrt(r.reduce((a, b) => a + (b - m) ** 2, 0) / 3);
+    const adv = r.map(x => (x - m) / (sd + 1e-6));
+    document.getElementById('groupRows').innerHTML = r.map((x, i) => {
+      const a = adv[i], w = Math.min(50, Math.abs(a) / 1.8 * 50);
+      return `<div class="row"><span>rollout ${i + 1}</span><div class="bar"><div style="position:absolute;top:0;height:8px;border-radius:4px;${a >= 0 ? 'left:50%' : 'right:50%'};width:${w}%;background:${a >= 0 ? C.lora : C.crit}"></div><div style="position:absolute;left:50%;top:-3px;width:1px;height:14px;background:${C.muted}"></div></div><span class="${x ? 'ok' : 'bad'}">${x ? '✓ r=1' : '✗ r=0'}</span><span class="mono" style="text-align:right">A=${a >= 0 ? '+' : ''}${a.toFixed(2)}</span></div>`;
+    }).join('');
+    document.getElementById('groupNote').textContent = sd === 0 ? 'All rollouts agree, so every advantage is 0 and this group is skipped (no gradient). Our logs track this as n_active.'
+      : `Correct rollouts get pushed up and wrong ones pushed down, weighted by how surprising each outcome is in its group.`;
+    p = (p + 1) % pats.length;
+  }
+  group(); if (!reduceMotion) setInterval(group, 3200);
+})();
+
+/* ---------- 6. paper results ---------- */
+const PAPER = {
+  models: ['Llama 1B', 'Llama 3B', 'Llama 8B', 'Qwen 0.5B', 'Qwen 3B', 'Qwen 7B'],
+  methods: [
+    ['Base', C.base, [1.21, 53.53, 60.27, 10.44, 37.73, 40.18]],
+    ['FFT', C.fft, [60.50, 82.49, 83.24, 19.01, 44.35, 51.89]],
+    ['LoRA r=1', C.lora, [59.29, 82.39, 83.38, 20.30, 43.55, 52.13]],
+    ['MTH 99.95%', C.mth, [58.61, 82.17, 83.07, 20.16, 43.87, 51.24]],
+    ['Deletion Tuning', C.dt, [54.44, 81.49, 83.55, 17.64, 41.98, 52.32]],
+  ],
+  sizes: { FFT: [4714, 12256, 30633, 1885, 11772, 29051], 'LoRA r=1': [2.7, 5.8, 10.0, 2.1, 7.1, 9.6], 'MTH 99.95%': [4.1, 10.7, 26.6, 1.7, 13.7, 25.3], 'Deletion Tuning': [1.0, 3.1, 8.4, 0.5, 2.7, 6.9] },
+};
+legend('resLegend', PAPER.methods.map(m => [m[0], m[1]]), true);
+chart('resChart', (c, W) => {
+  const H = 320, m = { l: 40, r: 10, t: 14, b: 44 }, svg = el('svg', { width: W, height: H }, c);
+  const Y = v => H - m.b - v / 90 * (H - m.t - m.b);
+  for (const t of [0, 20, 40, 60, 80]) { el('line', { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), stroke: C.grid }, svg); txt(svg, m.l - 8, Y(t) + 4, t, { 'text-anchor': 'end' }); }
+  const gw = (W - m.l - m.r) / 6, nb = PAPER.methods.length, bw = Math.min(26, (gw - 24) / nb);
+  PAPER.models.forEach((mod, gi) => {
+    const x0 = m.l + gi * gw + (gw - nb * bw) / 2;
+    txt(svg, m.l + gi * gw + gw / 2, H - m.b + 20, mod, { 'text-anchor': 'middle', class: 't2' });
+    txt(svg, m.l + gi * gw + gw / 2, H - m.b + 36, gi < 3 ? 'GSM8K' : 'math avg', { 'text-anchor': 'middle' });
+    PAPER.methods.forEach(([name, col, vals], mi) => {
+      const v = vals[gi], x = x0 + mi * bw, y = Y(v);
+      const r = el('path', { d: `M${x + 1},${Y(0)}L${x + 1},${y + 4}Q${x + 1},${y} ${x + 5},${y}L${x + bw - 5},${y}Q${x + bw - 1},${y} ${x + bw - 1},${y + 4}L${x + bw - 1},${Y(0)}Z`, fill: col }, svg);
+      if (name === 'Deletion Tuning') txt(svg, x + bw / 2, y - 6, v.toFixed(1), { 'text-anchor': 'middle', class: 't1', 'font-size': 11 });
+      r.addEventListener('mousemove', ev => {
+        const sz = PAPER.sizes[name] ? ` · ${PAPER.sizes[name][gi]} MB` : '';
+        showTip(`<div class="h">${mod}</div>` + PAPER.methods.map(mm => row(mm[1], mm[0], mm[2][gi].toFixed(2) + (PAPER.sizes[mm[0]] ? ` <span class="muted">(${PAPER.sizes[mm[0]][gi]} MB)</span>` : ''))).join(''), ev);
+        r.setAttribute('opacity', .8);
+      });
+      r.addEventListener('mouseleave', () => { hideTip(); r.setAttribute('opacity', 1); });
+    });
+  });
+  el('line', { x1: m.l, x2: W - m.r, y1: Y(0), y2: Y(0), stroke: C.axis }, svg);
+});
+document.getElementById('resTable').innerHTML = `<table class="t"><thead><tr><th>Method</th>${PAPER.models.map(m => `<th>${m}</th>`).join('')}</tr></thead><tbody>${PAPER.methods.map(([n, , v]) => `<tr class="${n === 'Deletion Tuning' ? 'hl' : ''}"><td>${n}</td>${v.map((x, i) => `<td class="n">${x.toFixed(2)}${PAPER.sizes[n] ? `<br><span class="muted" style="font-size:11px">${PAPER.sizes[n][i]} MB</span>` : ''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+
+/* ---------- 7. size / forgetting / geometry ---------- */
+function hbars(c, W, items, o) {
+  const rh = o.rowH || 30, H = items.length * rh + 28, lw = o.labelW || 112, svg = el('svg', { width: W, height: H }, c);
+  const X = o.log ? v => lw + (Math.log10(v) - o.lo) / (o.hi - o.lo) * (W - lw - 60) : v => lw + (v - o.lo) / (o.hi - o.lo) * (W - lw - 60);
+  for (const t of o.ticks) { el('line', { x1: X(t), x2: X(t), y1: 0, y2: H - 22, stroke: C.grid }, svg); txt(svg, X(t), H - 6, o.tickFmt ? o.tickFmt(t) : t, { 'text-anchor': 'middle' }); }
+  items.forEach((it, i) => {
+    const y = i * rh + 6, h = rh - 12;
+    txt(svg, lw - 8, y + h / 2 + 4, it.name, { 'text-anchor': 'end', class: 't2' });
+    const x1 = X(it.lo ?? (o.log ? Math.pow(10, o.lo) : o.lo)), x2 = X(it.hi ?? it.v);
+    const r = el('rect', { x: Math.min(x1, x2), y, width: Math.max(4, Math.abs(x2 - x1)), height: h, rx: 4, fill: it.color }, svg);
+    txt(svg, Math.max(x1, x2) + 6, y + h / 2 + 4, it.label, { class: 't1' });
+    r.addEventListener('mousemove', ev => showTip(row(it.color, it.name, it.label), ev)); r.addEventListener('mouseleave', hideTip);
+  });
+}
+chart('sizeChart', (c, W) => hbars(c, W, [
+  { name: 'FFT', v: 30633, color: C.fft, label: '30.6 GB' },
+  { name: 'MTH 99%', v: 443.6, color: C.mth, label: '444 MB' },
+  { name: 'LoRA r=4', v: 40.0, color: C.lora, label: '40 MB' },
+  { name: 'MTH 99.95%', v: 26.6, color: C.mth, label: '26.6 MB' },
+  { name: 'LoRA r=1', v: 10.0, color: C.lora, label: '10 MB' },
+  { name: 'Deletion', v: 8.4, color: C.dt, label: '8.4 MB' },
+], { log: true, lo: 0, hi: 5, ticks: [1, 100, 10000], tickFmt: t => t >= 1000 ? t / 1000 + ' GB' : t + ' MB', labelW: 92 }));
+chart('klChart', (c, W) => {
+  txt(el('svg', { width: W, height: 18 }, c), 0, 13, 'forward KL to base on GSM8K', { class: 't2' });
+  hbars(c, W, [
+    { name: 'Deletion', lo: 0, hi: .05, color: C.dt, label: '≤ 0.05' },
+    { name: 'LoRA / MTH', lo: .4, hi: 1.3, color: C.lora, label: '0.4–1.3' },
+    { name: 'FFT', lo: 1.0, hi: 1.5, color: C.fft, label: '1.0–1.5' },
+  ], { lo: 0, hi: 1.6, ticks: [0, .5, 1, 1.5], labelW: 92, rowH: 28 });
+});
+chart('dropChart', (c, W) => {
+  txt(el('svg', { width: W, height: 18 }, c), 0, 13, 'Δ prior-task accuracy vs base (pts)', { class: 't2' });
+  hbars(c, W, [
+    { name: 'Deletion', lo: -1, hi: 0, color: C.dt, label: 'within 1' },
+    { name: 'LoRA / MTH', lo: -5.4, hi: 0, color: C.lora, label: 'down to −5.4' },
+    { name: 'FFT', lo: -3.1, hi: -1.3, color: C.fft, label: '−1.3 to −3.1' },
+  ], { lo: -6, hi: 0.5, ticks: [-6, -4, -2, 0], labelW: 92, rowH: 28 });
+});
+chart('geoChart', (c, W) => hbars(c, W, [
+  { name: 'LoRA', lo: 1, hi: 2, color: C.lora, label: '1–2' },
+  { name: 'Deletion', lo: 66, hi: 93, color: C.dt, label: '66–93' },
+  { name: 'MTH', lo: 410, hi: 650, color: C.mth, label: '410–650' },
+], { log: true, lo: 0, hi: 3, ticks: [1, 10, 100, 1000], labelW: 72, rowH: 40 }));
+
+/* ---------- 9/10. our runs ---------- */
+const runs = Object.entries(D.runs || {}).filter(([k]) => RUNCOL[k]);
+const roll = (a, k) => a.map((p, i) => { const s = a.slice(Math.max(0, i - k + 1), i + 1); return [p[0], s.reduce((x, q) => x + q[1], 0) / s.length]; });
+const main = D.runs && D.runs.dt_gsm8k;
+if (main && main.eval.length) {
+  const e = main.eval, e0 = e[0], best = e.reduce((a, b) => b[1] > a[1] ? b : a), last = e[e.length - 1];
+  const d = (best[1] - e0[1]) * 100;
+  document.getElementById('heroOurs').textContent = (d >= 0 ? '+' : '') + d.toFixed(1) + ' pts';
+  document.getElementById('heroOursLbl').textContent = `GSM8K in our run (${(e0[1] * 100).toFixed(1)}→${(best[1] * 100).toFixed(1)}%), zeroing ${(best[3] * 100).toFixed(3)}% of weights`;
+  const lastTrain = main.train[main.train.length - 1];
+  const done = last[0] >= main.steps;
+  const tiles = [
+    [`${(e0[1] * 100).toFixed(1)}% → ${(best[1] * 100).toFixed(1)}%`, `seed 0 GSM8K, step 0 → best (step ${best[0]})`],
+    [(d >= 0 ? '+' : '') + d.toFixed(1) + ' pts', `≈ ${(d / 2.2).toFixed(1)}× the binomial SE at n=500`],
+    [(best[3] * 100).toFixed(3) + '%', `of all text weights zeroed (${best[4].toLocaleString()} weights)`],
+    [`${lastTrain ? lastTrain[0] + 1 : 0} / ${main.steps}`, done ? 'steps, finished' : 'steps completed (seed 0)'],
+  ];
+  document.getElementById('ourTiles').innerHTML = tiles.map(([b, l]) => `<div class="card stat"><div class="big" style="font-size:26px;white-space:nowrap">${b}</div><div class="lbl">${l}</div></div>`).join('');
+  const allDone = runs.every(([, r]) => r.eval.length && r.eval[r.eval.length - 1][0] >= r.steps);
+  if (allDone) { document.getElementById('livePill').textContent = 'all runs finished'; document.getElementById('livePill').classList.remove('live'); }
+}
+const acc = runs.map(([k, r]) => ({ name: RUNNAME[k], color: RUNCOL[k], pts: r.eval.map(p => [p[0], p[1]]), marker: true }));
+legend('accLegend', acc.map(s => [s.name + (s.pts.length < 3 ? ' (running)' : ''), s.color]));
+chart('accChart', (c, W) => lineChart(c, W, {
+  series: acc, xDomain: [0, 200], yDomain: [0.50, 0.64], yFmt: v => (v * 100).toFixed(0) + '%', tipFmt: v => (v * 100).toFixed(1) + '%', xLabel: 'step',
+  bands: main ? [{ color: C.dt, pts: main.eval.map(p => { const se = Math.sqrt(p[1] * (1 - p[1]) / 500); return [p[0], p[1] + se, p[1] - se]; }) }] : [],
+}));
+const rew = runs.map(([k, r]) => ({ name: RUNNAME[k], color: RUNCOL[k], pts: roll(r.train.map(p => [p[0], p[1]]), 10) }));
+legend('rewLegend', rew.map(s => [s.name, s.color]));
+chart('rewChart', (c, W) => lineChart(c, W, { series: rew, xDomain: [0, 200], yFmt: v => (v * 100).toFixed(0) + '%', tipFmt: v => (v * 100).toFixed(1) + '%', xLabel: 'step' }));
+const del = runs.map(([k, r]) => ({ name: RUNNAME[k], color: RUNCOL[k], pts: r.train.map(p => [p[0], p[2]]) }));
+legend('delLegend', del.map(s => [s.name, s.color]));
+chart('delChart', (c, W) => lineChart(c, W, { series: del, xDomain: [0, 200], yFmt: v => (v * 100).toFixed(3) + '%', tipFmt: v => (v * 100).toFixed(4) + '%', xLabel: 'step', height: 230 }));
+if (main && main.eval.length > 3) {
+  const e = main.eval, at = s => (e.find(p => p[0] === s) || [])[4];
+  const a75 = at(75), last = e[e.length - 1];
+  document.getElementById('delCap').innerHTML = `Seed 0: ${e[0][4].toLocaleString()} deleted at init → ${a75 ? a75.toLocaleString() : '?'} by step 75 → ${last[4].toLocaleString()} at step ${last[0]}. That is only <b>${(last[4] - (a75 || last[4])).toLocaleString()}</b> net new deletions in the last ${last[0] - 75} steps.`;
+}
+chart('bandChart', (c, W) => {
+  const pts = []; for (let s = 0; s <= 200; s += 2) pts.push([s, 16.6 / (1000 + s * 45)]);
+  lineChart(c, W, { series: [{ name: 'band |G| <', color: C.mth, pts }], xDomain: [0, 200], yDomain: [0, .018], yFmt: v => v.toFixed(3), tipFmt: v => '±' + v.toFixed(4), xLabel: 'step', height: 230 });
+});
+const len = runs.map(([k, r]) => ({ name: RUNNAME[k], color: RUNCOL[k], pts: roll(r.train.map(p => [p[0], p[3]]), 10) }));
+legend('lenLegend', len.map(s => [s.name, s.color]));
+chart('lenChart', (c, W) => lineChart(c, W, { series: len, xDomain: [0, 200], yFmt: v => Math.round(v), xLabel: 'step', height: 230 }));
+
+// per-layer
+(function layers() {
+  const M = D.masks && D.masks.runs; if (!M || !M.dt_gsm8k) return;
+  const seeds = ['dt_seed1', 'dt_seed2', 'dt_seed3'].filter(s => M[s]);
+  const base = M.dt_gsm8k.per_layer.map((_, i) => seeds.reduce((a, s) => a + M[s].per_layer[i], 0) / seeds.length);
+  const extra = M.dt_gsm8k.per_layer.map((v, i) => v - base[i]);
+  const full = new Set([3, 7, 11, 15, 19, 23]);
+  chart('layerChart', (c, W) => {
+    const H = 220, m = { l: 44, r: 6, t: 10, b: 30 }, svg = el('svg', { width: W, height: H }, c);
+    const ymax = Math.max(...extra) * 1.1, Y = v => H - m.b - Math.max(0, v) / ymax * (H - m.t - m.b), bw = (W - m.l - m.r) / 24;
+    for (const t of niceTicks(0, ymax, 4)) { el('line', { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), stroke: C.grid }, svg); txt(svg, m.l - 6, Y(t) + 4, t, { 'text-anchor': 'end' }); }
+    extra.forEach((v, i) => {
+      const x = m.l + i * bw + 1, y = Y(v), w = bw - 2;
+      const r = el('path', { d: `M${x},${Y(0)}L${x},${y + 3}Q${x},${y} ${x + 3},${y}L${x + w - 3},${y}Q${x + w},${y} ${x + w},${y + 3}L${x + w},${Y(0)}Z`, fill: C.dt }, svg);
+      if (full.has(i)) el('rect', { x, y: H - m.b + 4, width: w, height: 4, rx: 2, fill: C.s7 }, svg);
+      if (i % 4 === 0 || i === 23) txt(svg, x + w / 2, H - 6, i, { 'text-anchor': 'middle' });
+      r.addEventListener('mousemove', ev => showTip(`<div class="h">block ${i} · ${full.has(i) ? 'full attention' : 'Gated DeltaNet'}</div>` + row(C.dt, 'trained mask', M.dt_gsm8k.per_layer[i].toLocaleString()) + row(C.base, 'mean init (seeds)', Math.round(base[i]).toLocaleString()) + row(C.dt, 'extra', '+' + Math.round(v).toLocaleString()), ev));
+      r.addEventListener('mouseleave', hideTip);
+    });
+  });
+  // overlap box
+  const ov = D.masks.intersect || {}, jac = D.masks.overlap || {};
+  const k0 = seeds.map(s => `dt_gsm8k|${s}`).filter(k => ov[k] != null);
+  const kept = k0.length ? k0.reduce((a, k) => a + ov[k], 0) / k0.length : null;
+  const wandaTot = 1792 * 24;
+  document.getElementById('overlapBox').innerHTML = `
+    <div class="grid2" style="margin:8px 0 12px">
+      <div class="stat"><div class="big" style="font-size:30px">${M.dt_gsm8k.total.toLocaleString()}</div><div class="lbl">deleted in seed-0 best mask (0.203% of gate)</div></div>
+      <div class="stat"><div class="big" style="font-size:30px">${kept ? Math.round(kept).toLocaleString() : '–'}</div><div class="lbl">shared with another seed's <i>init</i> mask (Wanda core ≈ ${wandaTot.toLocaleString()})</div></div>
+    </div>
+    <p class="sec" style="font-size:14px;margin:0">The trained mask still contains essentially the whole Wanda core: training <b>adds</b> deletions on top of the prior instead of overturning it.
+      Deletions are spread almost uniformly over the 1,024 input dimensions (the top 10% of columns hold ${(M.dt_gsm8k.top10pct_cols_share * 100).toFixed(1)}% of deletions, against 10% for uniform), and no output channel loses more than ${Math.max(...M.dt_gsm8k.row_max)} of its 1,024 weights.
+      So the learned edit is a sparse sprinkling of cuts, not channel pruning.</p>`;
+})();
+
+if (D.built) document.getElementById('builtAt').textContent = 'Data snapshot: ' + new Date(D.built * 1000).toLocaleString() + ' (re-run site/build_data.py to refresh)';
+
+/* ---------- nav ---------- */
+const slides = [...document.querySelectorAll('.slide')];
+const dots = document.getElementById('dots');
+slides.forEach((s, i) => { const a = document.createElement('a'); a.href = '#' + s.id; a.innerHTML = `<span>${i ? String(i).padStart(2, '0') + ' · ' : ''}${s.dataset.title}</span>`; dots.appendChild(a); });
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { const i = slides.indexOf(e.target); [...dots.children].forEach((d, j) => d.classList.toggle('on', i === j)); } }), { threshold: .5 });
+slides.forEach(s => io.observe(s));
+addEventListener('scroll', () => { document.getElementById('prog').style.width = (scrollY / (document.body.scrollHeight - innerHeight) * 100) + '%'; });
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const cur = slides.findIndex(s => s.getBoundingClientRect().top > -innerHeight / 2 && s.getBoundingClientRect().top < innerHeight / 2);
+  if (['ArrowDown', 'PageDown', ' ', 'ArrowRight'].includes(e.key)) { e.preventDefault(); slides[Math.min(slides.length - 1, cur + 1)].scrollIntoView(); }
+  if (['ArrowUp', 'PageUp', 'ArrowLeft'].includes(e.key)) { e.preventDefault(); slides[Math.max(0, cur - 1)].scrollIntoView(); }
+});
+</script>
+</body>
+</html>

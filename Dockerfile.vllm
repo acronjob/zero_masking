@@ -1,0 +1,7 @@
+FROM vllm/vllm-openai:v0.33.0
+ENV PYTHONUNBUFFERED=1 HF_HOME=/hf_cache TOKENIZERS_PARALLELISM=false PIP_BREAK_SYSTEM_PACKAGES=1 \
+    VLLM_ENABLE_V1_MULTIPROCESSING=0 VLLM_ALLOW_INSECURE_SERIALIZATION=1
+# training side: fused Gated DeltaNet kernels for HF + data loading (vLLM/torch/transformers come from the base image)
+RUN pip install --no-cache-dir flash-linear-attention datasets pandas
+ENTRYPOINT []
+WORKDIR /workspace/src

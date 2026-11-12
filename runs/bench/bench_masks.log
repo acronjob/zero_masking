@@ -1,0 +1,33 @@
+16:25:04 GPU 0: seed0_step0 -> baking + serving on :8010
+16:25:04 GPU 1: seed0_step25 -> baking + serving on :8011
+16:25:04 GPU 7: seed0_step75 -> baking + serving on :8017
+16:25:04 GPU 6: seed0_step50 -> baking + serving on :8016
+16:27:39 GPU 1: seed0_step25 done rc=0: PASS 18 / FAIL 10 / DECOY 2
+16:27:40 GPU 6: seed0_step50 done rc=0: PASS 17 / FAIL 9 / DECOY 4
+16:27:40 GPU 1: seed0_step100 -> baking + serving on :8011
+16:27:41 GPU 6: seed1_step0 -> baking + serving on :8016
+16:27:41 GPU 7: seed0_step75 done rc=0: PASS 17 / FAIL 10 / DECOY 3
+16:27:43 GPU 7: seed1_step25 -> baking + serving on :8017
+16:29:38 GPU 0: seed0_step0 done rc=0: PASS 17 / FAIL 10 / DECOY 3
+16:29:39 GPU 0: seed1_step50 -> baking + serving on :8010
+16:30:11 GPU 6: seed1_step0 done rc=0: PASS 19 / FAIL 9 / DECOY 2
+16:30:13 GPU 6: seed1_step75 -> baking + serving on :8016
+16:30:15 GPU 1: seed0_step100 done rc=0: PASS 15 / FAIL 11 / DECOY 4
+16:30:17 GPU 1: seed2_step0 -> baking + serving on :8011
+16:30:19 GPU 7: seed1_step25 done rc=0: PASS 17 / FAIL 11 / DECOY 2
+16:30:21 GPU 7: seed2_step25 -> baking + serving on :8017
+16:32:27 GPU 0: seed1_step50 done rc=0: PASS 17 / FAIL 12 / DECOY 1
+16:32:28 GPU 0: seed2_step50 -> baking + serving on :8010
+16:32:54 GPU 1: seed2_step0 done rc=0: PASS 20 / FAIL 7 / DECOY 3
+16:32:55 GPU 1: seed2_step75 -> baking + serving on :8011
+16:32:57 GPU 6: seed1_step75 done rc=0: PASS 18 / FAIL 10 / DECOY 2
+16:32:59 GPU 6: seed3_step0 -> baking + serving on :8016
+16:33:02 GPU 7: seed2_step25 done rc=0: PASS 18 / FAIL 10 / DECOY 2
+16:33:04 GPU 7: seed3_step25 -> baking + serving on :8017
+16:35:03 GPU 0: seed2_step50 done rc=0: PASS 17 / FAIL 8 / DECOY 2 / NOT_STATED 3
+16:35:04 GPU 0: seed3_step75 -> baking + serving on :8010
+16:35:30 GPU 1: seed2_step75 done rc=0: PASS 18 / FAIL 10 / DECOY 2
+16:35:38 GPU 7: seed3_step25 done rc=0: PASS 18 / FAIL 10 / DECOY 2
+16:35:46 GPU 6: seed3_step0 done rc=0: PASS 14 / FAIL 13 / DECOY 3
+16:37:30 GPU 0: seed3_step75 done rc=0: PASS 15 / FAIL 11 / DECOY 3 / NOT_STATED 1
+16:37:32 all done

@@ -1,0 +1,6 @@
+{"step": 0, "eval_acc": 0.515625, "deleted": 161214, "frac_of_gate": 0.0018303053719656809, "frac_of_model": 0.00021426833431140372, "eval_s": 18.7}
+{"step": 0, "reward": 0.328125, "pg_loss": -0.059294311329722404, "reg": -0.19070038199424744, "alpha": 1000.0, "frac_deleted_gate": 0.0018377417609805153, "mean_len": 490.53125, "n_active": 72, "gen_s": 12.3, "step_s": 44.2}
+{"step": 1, "reward": 0.3515625, "pg_loss": -0.02062668837606907, "reg": -0.19080998003482819, "alpha": 3250.0, "frac_deleted_gate": 0.0018414202190580823, "mean_len": 459.8359375, "n_active": 56, "gen_s": 18.1, "step_s": 20.1}
+{"step": 2, "reward": 0.46875, "pg_loss": -0.03599438234232366, "reg": -0.19082313776016235, "alpha": 5500.0, "frac_deleted_gate": 0.0018450305575416202, "mean_len": 440.0546875, "n_active": 88, "gen_s": 12.1, "step_s": 15.1}
+{"step": 3, "reward": 0.296875, "pg_loss": -0.03989175404421985, "reg": -0.19082874059677124, "alpha": 7750.0, "frac_deleted_gate": 0.001850173586890811, "mean_len": 484.0, "n_active": 72, "gen_s": 18.3, "step_s": 20.7}
+{"step": 4, "eval_acc": 0.578125, "deleted": 162964, "frac_of_gate": 0.001850173586890811, "frac_of_model": 0.00021659424636026397, "eval_s": 12.0}

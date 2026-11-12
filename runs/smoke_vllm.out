@@ -1,0 +1,843 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+W1111 21:03:54.478000 1 torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1111 21:03:54.478000 1 torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1111 21:03:54.478000 1 torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+(MainProcess pid=1) INFO 11-11 21:03:56 [startup.py:96] non-default args: {'max_model_len': 4608, 'gpu_memory_utilization': 0.35, 'disable_log_stats': True, 'limit_mm_per_prompt': {'image': 0, 'video': 0}, 'enable_sleep_mode': True, 'model': 'Qwen/Qwen3.5-0.8B'}
+(MainProcess pid=1) WARNING 11-11 21:03:56 [arg_utils.py:1984] The global random seed is set to 0. Since VLLM_ENABLE_V1_MULTIPROCESSING is set to False, this may affect the random state of the Python process that launched vLLM.
+(MainProcess pid=1) INFO 11-11 21:03:56 [model.py:670] Enabling cumem allocator because sleep mode requires it.
+(MainProcess pid=1) INFO 11-11 21:04:04 [model.py:744] Resolved architecture: Qwen3_5ForConditionalGeneration
+(MainProcess pid=1) INFO 11-11 21:04:04 [model.py:2170] Using max model len 4608
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]Fetching 12 files: 100%|██████████| 12/12 [00:00<00:00, 4435.29it/s]
+(MainProcess pid=1) INFO 11-11 21:04:06 [model.py:964] All limits of multimodal modalities supported by the model are set to 0, running in text-only mode.
+(MainProcess pid=1) INFO 11-11 21:04:06 [model.py:1021] Disabled mm_prefix attention mode because multimodal inputs are configuration-disabled. Attention backends without mm_prefix support may now be selected.
+(MainProcess pid=1) INFO 11-11 21:04:06 [scheduler.py:310] Chunked prefill is enabled with max_num_batched_tokens=16384.
+(MainProcess pid=1) INFO 11-11 21:04:06 [config.py:766] Mamba cache mode is set to 'align' for Qwen3_5ForConditionalGeneration by default when prefix caching is enabled
+Parse safetensors files:   0%|          | 0/1 [00:00<?, ?it/s]Parse safetensors files: 100%|██████████| 1/1 [00:00<00:00,  3.02it/s]Parse safetensors files: 100%|██████████| 1/1 [00:00<00:00,  3.02it/s]
+(MainProcess pid=1) INFO 11-11 21:04:06 [kernel.py:480] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native'])
+(MainProcess pid=1) INFO 11-11 21:04:08 [core.py:139] Initializing a V1 LLM engine (v0.33.0) with config: model='Qwen/Qwen3.5-0.8B', speculative_config=None, tokenizer='Qwen/Qwen3.5-0.8B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=main, tokenizer_revision=main, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=4608, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=None, quantization_config=None, enforce_eager=False, aux_output_config=AuxOutputConfig(enable_return_routed_experts=False, max_bytes=None), kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, per_request_spec_decode_metrics='none', kv_cache_metrics=False, kv_cache_metrics_sample=0.01, custom_histogram_buckets=None, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=Qwen/Qwen3.5-0.8B, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.VLLM_COMPILE: 3>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['none'], 'ir_enable_torch_wrap': True, 'splitting_ops': ['vllm::unified_attention_with_output', 'vllm::unified_mla_attention_with_output', 'vllm::mamba_mixer2', 'vllm::mamba_mixer', 'vllm::short_conv', 'vllm::qwen4_exp_ple_short_conv', 'vllm::qwen4_exp_qsa_with_output', 'vllm::qwen4_exp_qsa_prepare_with_output', 'vllm::linear_attention', 'vllm::qwen_gdn_attention_core', 'vllm::qwen_gdn_attention_core_fused_norm_packed', 'vllm::gdn_attention_core_xpu', 'vllm::olmo_hybrid_gdn_full_forward', 'vllm::sparse_attn_indexer', 'vllm::rocm_aiter_sparse_attn_indexer', 'vllm::deepseek_v4_attention', 'vllm::hpc_rope_norm_forward', 'vllm::unified_kv_cache_update', 'vllm::unified_mla_kv_cache_update'], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'cudagraph_decoder_replay': True, 'decoder_replay_cudagraph_capture_sizes': [], 'decoder_replay_trim_threshold': 768, 'compile_sizes': [], 'compile_ranges_endpoints': [16384], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.FULL_AND_PIECEWISE: (2, 1)>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': False, 'fuse_act_quant': False, 'fuse_attn_quant': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': 512, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native']), enable_flashinfer_autotune=True, enable_rocm_segmented_attn_autotune=False, enable_cutedsl_warmup=True, enable_jit_warmup=True, monokernel=False, moe_backend='auto', sparse_indexer_topk_backend='auto', linear_backend='auto', linear_backend_per_quant=None)
+(MainProcess pid=1) INFO 11-11 21:04:08 [parallel_state.py:1929] world_size=1 rank=0 local_rank=0 distributed_init_method=file:///tmp/vllm_dist_e8f2c0cc31844f508bbe53269f283ad8 backend=nccl
+(MainProcess pid=1) INFO 11-11 21:04:08 [parallel_state.py:2385] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, ETP rank 0, EP rank N/A, EPLB rank N/A
+(MainProcess pid=1) INFO 11-11 21:04:08 [gpu_worker.py:513] Using V2 Model Runner
+(MainProcess pid=1) INFO 11-11 21:04:15 [model_runner.py:399] Loading model from scratch...
+(MainProcess pid=1) INFO 11-11 21:04:15 [cuda.py:567] Using backend AttentionBackendEnum.FLASH_ATTN for vit attention
+(MainProcess pid=1) INFO 11-11 21:04:15 [mm_encoder_attention.py:372] Using AttentionBackendEnum.FLASH_ATTN for MMEncoderAttention.
+(MainProcess pid=1) INFO 11-11 21:04:15 [qwen_gdn_linear_attn.py:300] Using FlashInfer GDN prefill kernel (requested=auto, head_k_dim=128).
+(MainProcess pid=1) INFO 11-11 21:04:19 [cuda.py:508] Using FLASH_ATTN attention backend out of potential backends: ['FLASH_ATTN', 'FLASHINFER', 'TRITON_ATTN', 'FLEX_ATTENTION'].
+(MainProcess pid=1) INFO 11-11 21:04:19 [flash_attn.py:1122] Using FlashAttention version 2
+(MainProcess pid=1) INFO 11-11 21:04:19 [base_loader.py:82] Initializing model took 4.497870 seconds
+(MainProcess pid=1) INFO 11-11 21:04:19 [weight_utils.py:1144] Filesystem type for checkpoints: EXT4. Checkpoint size: 1.63 GiB. Available RAM: 60.90 GiB.
+(MainProcess pid=1) INFO 11-11 21:04:19 [weight_utils.py:1167] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.0.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.1.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.10.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.12.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.13.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.14.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.16.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.17.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.18.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.2.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.20.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.21.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.22.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.4.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.5.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.6.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.8.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+(MainProcess pid=1) WARNING 11-11 21:04:19 [utils.py:333] Attempted to load weight layers.9.linear_attn.norm.weight with dtype torch.float32 into parameter with dtype torch.bfloat16
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  9.35it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  9.34it/s]
+
+(MainProcess pid=1) INFO 11-11 21:04:19 [default_loader.py:506] Loading weights took 0.11 seconds
+(MainProcess pid=1) INFO 11-11 21:04:21 [model_runner.py:428] Model loading took 1.43 GiB memory and 7.106366 seconds
+(MainProcess pid=1) INFO 11-11 21:04:21 [topk_topp_sampler.py:149] Using FlashInfer for top-p & top-k sampling.
+(MainProcess pid=1) INFO 11-11 21:04:21 [torch_utils.py:281] Reducing Torch threads from 24 to 1 for serving. Set OMP_NUM_THREADS in the external environment to override.
+(MainProcess pid=1) INFO 11-11 21:04:21 [interface.py:1108] Setting attention block size to 576 tokens to ensure that attention page size is >= mamba page size.
+(MainProcess pid=1) INFO 11-11 21:04:21 [interface.py:1132] Padding mamba page size by 8.68% to ensure that mamba page size and attention page size are exactly equal.
+(MainProcess pid=1) INFO 11-11 21:04:21 [utils.py:381] Using LBNHC KV cache layout.
+(MainProcess pid=1) INFO 11-11 21:04:23 [monitor.py:40] [backbone] Starting torch.compile
+(MainProcess pid=1) INFO 11-11 21:04:24 [backends.py:1125] [backbone] Using cache directory: /root/.cache/vllm/torch_compile_cache/5b5b29576e/rank_0_0/backbone for vLLM's torch.compile
+(MainProcess pid=1) INFO 11-11 21:04:24 [backends.py:1187] [backbone] Dynamo bytecode transform time: 1.47 s
+(MainProcess pid=1) INFO 11-11 21:04:31 [backends.py:417] [backbone] Compiling a graph for compile range (1, 16384) takes 6.58 s
+(MainProcess pid=1) INFO 11-11 21:04:32 [backends.py:948] collected artifacts: 25 entries, 10 artifacts, 18440714 bytes total
+(MainProcess pid=1) INFO 11-11 21:04:32 [decorators.py:752] [backbone] saved AOT compiled function to /root/.cache/vllm/torch_compile_cache/torch_aot_compile/e97fa5f9396fa7dd5d405cd0827e0798a36b830d80f120b2f790ebe79c88deee/rank_0_0/model
+(MainProcess pid=1) INFO 11-11 21:04:32 [monitor.py:62] [backbone] torch.compile took 8.92 s in total
+(MainProcess pid=1) INFO 11-11 21:04:50 [monitor.py:91] [backbone] Initial profiling/warmup run took 18.61 s
+Capturing CUDA graphs (PIECEWISE):   0%|          | 0/51 [00:00<?, ?it/s]Capturing CUDA graphs (PIECEWISE):   2%|▏         | 1/51 [00:32<26:59, 32.38s/it]Capturing CUDA graphs (PIECEWISE):  16%|█▌        | 8/51 [00:32<02:07,  2.96s/it]Capturing CUDA graphs (PIECEWISE):  29%|██▉       | 15/51 [00:32<00:46,  1.30s/it]Capturing CUDA graphs (PIECEWISE):  43%|████▎     | 22/51 [00:32<00:21,  1.37it/s]Capturing CUDA graphs (PIECEWISE):  55%|█████▍    | 28/51 [00:32<00:11,  2.09it/s]Capturing CUDA graphs (PIECEWISE):  69%|██████▊   | 35/51 [00:33<00:04,  3.25it/s]Capturing CUDA graphs (PIECEWISE):  84%|████████▍ | 43/51 [00:33<00:01,  5.07it/s]Capturing CUDA graphs (PIECEWISE):  96%|█████████▌| 49/51 [00:33<00:00,  6.59it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 51/51 [00:33<00:00,  1.52it/s]
+Capturing CUDA graphs (FULL):   0%|          | 0/2 [00:00<?, ?it/s]Capturing CUDA graphs (FULL): 100%|██████████| 2/2 [00:00<00:00, 81.49it/s]
+(MainProcess pid=1) INFO 11-11 21:05:31 [model_runner.py:1163] Graph capturing finished in 35 secs, took 0.24 GiB
+(MainProcess pid=1) INFO 11-11 21:05:32 [gpu_worker.py:772] Available KV cache memory: 26.95 GiB
+(MainProcess pid=1) INFO 11-11 21:05:32 [gpu_worker.py:787] CUDA graph memory profiling is enabled (default since v0.21.0). The current --gpu-memory-utilization=0.3500 is equivalent to --gpu-memory-utilization=0.3465 without CUDA graph memory profiling. To maintain the same effective KV cache size as before, increase --gpu-memory-utilization to 0.3535. To disable, set VLLM_MEMORY_PROFILER_ESTIMATE_CUDAGRAPHS=0.
+(MainProcess pid=1) INFO 11-11 21:05:32 [kv_cache_utils.py:1147] GPU KV cache size: 1,108,088 tokens, Maximum concurrency for 4,608 tokens per request: 240.47x
+(MainProcess pid=1) INFO 11-11 21:05:32 [kv_cache_utils.py:865] kv cache group sizes (576, 576, 576, 576)
+(MainProcess pid=1) INFO 11-11 21:05:32 [kv_cache_utils.py:866] kv lcm block sizes 576
+(MainProcess pid=1) INFO 11-11 21:05:32 [kernel_warmup.py:179] JIT kernel warmup starting.
+(MainProcess pid=1) INFO 11-11 21:05:32 [kernel_warmup.py:192] JIT kernel warmup finished in 0.00s.
+(MainProcess pid=1) INFO 11-11 21:05:32 [qwen_triton_warmup.py:370] Warming up Qwen GDN Triton kernels for model_type=qwen3_5_text.
+(MainProcess pid=1) INFO 11-11 21:05:33 [mamba_triton_warmup.py:42] Warmed Mamba batch_memcpy_kernel.
+(MainProcess pid=1) INFO 11-11 21:05:33 [kernel_warmup.py:485] Using FlashInfer managed autotune cache (root=flashinfer default). Pass --disable-flashinfer-autotune to skip autotuning.
+2026-11-11 21:05:33,314 - INFO - autotuner.py:1048 - flashinfer.jit: [Autotuner]: Autotuning process starts ...
+2026-11-11 21:05:33,361 - INFO - autotune_cache.py:495 - flashinfer.jit: [Autotuner]: Managed autotune cache attached for this process: ManagedAutotuneCache(env_dir='/root/.cache/flashinfer/autotune/v2/5fe2be016346acba', hits=0, misses=0)
+(MainProcess pid=1) INFO 11-11 21:05:33 [kernel_warmup.py:371] Running FlashInfer autotune with 16384 tokens and token buckets (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2560, 3072, 3584, 4096, 8192, 16384).
+2026-11-11 21:05:51,185 - INFO - autotuner.py:1071 - flashinfer.jit: [Autotuner]: Autotuning process ends
+Capturing CUDA graphs (PIECEWISE):   0%|          | 0/51 [00:00<?, ?it/s]Capturing CUDA graphs (PIECEWISE):  12%|█▏        | 6/51 [00:00<00:00, 53.60it/s]Capturing CUDA graphs (PIECEWISE):  25%|██▌       | 13/51 [00:00<00:00, 60.27it/s]Capturing CUDA graphs (PIECEWISE):  39%|███▉      | 20/51 [00:00<00:00, 62.69it/s]Capturing CUDA graphs (PIECEWISE):  53%|█████▎    | 27/51 [00:00<00:00, 63.39it/s]Capturing CUDA graphs (PIECEWISE):  67%|██████▋   | 34/51 [00:00<00:00, 57.05it/s]Capturing CUDA graphs (PIECEWISE):  80%|████████  | 41/51 [00:00<00:00, 58.83it/s]Capturing CUDA graphs (PIECEWISE):  96%|█████████▌| 49/51 [00:00<00:00, 63.89it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 51/51 [00:00<00:00, 62.07it/s]
+Capturing CUDA graphs (FULL):   0%|          | 0/51 [00:00<?, ?it/s]Capturing CUDA graphs (FULL):  18%|█▊        | 9/51 [00:00<00:00, 85.91it/s]Capturing CUDA graphs (FULL):  35%|███▌      | 18/51 [00:00<00:00, 74.39it/s]Capturing CUDA graphs (FULL):  55%|█████▍    | 28/51 [00:00<00:00, 83.23it/s]Capturing CUDA graphs (FULL):  75%|███████▍  | 38/51 [00:00<00:00, 89.24it/s]Capturing CUDA graphs (FULL):  94%|█████████▍| 48/51 [00:00<00:00, 90.05it/s]Capturing CUDA graphs (FULL): 100%|██████████| 51/51 [00:00<00:00, 87.75it/s]
+(MainProcess pid=1) INFO 11-11 21:05:54 [model_runner.py:1163] Graph capturing finished in 3 secs, took 0.14 GiB
+(MainProcess pid=1) INFO 11-11 21:05:54 [gpu_worker.py:1003] CUDA graph pool memory: 0.14 GiB (actual), 0.34 GiB (estimated), difference: 0.2 GiB (142.3%).
+(MainProcess pid=1) INFO 11-11 21:05:54 [gpu_worker.py:1066] Free memory on device (94.32/95.06 GiB) on startup. Desired GPU memory utilization is (0.35, 33.27 GiB). Actual usage is 2.63 GiB for consumed memory (weights + non-torch), 3.69 GiB for peak activation, and 0.14 GiB for CUDAGraph memory. Replace gpu_memory_utilization config with `--kv-cache-memory=28634565120` (26.67 GiB) to fit into requested memory, or `--kv-cache-memory=94183836160` (87.72 GiB) to fully utilize gpu memory. Current kv cache memory in use is 26.95 GiB.
+(MainProcess pid=1) INFO 11-11 21:05:55 [jit_monitor.py:84] Kernel JIT monitor activated; monitored JIT compilations during inference will use mode=warn.
+(MainProcess pid=1) INFO 11-11 21:05:55 [core.py:405] init engine (profile, create kv cache, warmup model) took 94.01 s (compilation: 8.92 s)
+(MainProcess pid=1) INFO 11-11 21:05:56 [hf.py:736] Detected the chat template content format to be 'openai'. You can set `--chat-template-content-format` to override this.
+(MainProcess pid=1) INFO 11-11 21:05:56 [scheduler.py:3074] setting pause state to PAUSED_NEW
+(MainProcess pid=1) INFO 11-11 21:05:56 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:05:56 [sleep_mode_backend.py:202] Using sleep-mode backend: cumem
+(MainProcess pid=1) INFO 11-11 21:05:56 [cumem.py:282] CuMemAllocator: sleep freed 29.51 GiB memory in total, of which 2.53 GiB is backed up in CPU and the rest 26.98 GiB is discarded directly.
+(MainProcess pid=1) INFO 11-11 21:05:56 [gpu_worker.py:335] Sleep mode freed 29.5 GiB memory, 1.13 GiB memory is still in use.
+(MainProcess pid=1) INFO 11-11 21:05:56 [abstract.py:408] It took 0.491384 seconds to fall asleep.
+Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]Loading weights: 100%|██████████| 320/320 [00:00<00:00, 15513.45it/s]
+masked 24 gate_proj layers (88.1M logits); 348 steps, 1392 optimizer steps
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:05:57 [jit_monitor.py:140] Triton kernel JIT compilation during inference: l2norm_fwd_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function l2norm_fwd_kernel,
+with key as (128, 2, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32'),
+finished after 5.24s,
+best config selected: BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:06:03 [jit_monitor.py:140] Triton kernel JIT compilation during inference: chunk_local_cumsum_scalar_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (32, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_gated_delta_rule_fwd_kkt_solve_kernel with config BK: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:06:04 [jit_monitor.py:140] Triton kernel JIT compilation during inference: chunk_gated_delta_rule_fwd_kkt_solve_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel chunk_gated_delta_rule_fwd_kkt_solve_kernel with config BK: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kkt_solve_kernel with config BK: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kkt_solve_kernel with config BK: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kkt_solve_kernel with config BK: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kkt_solve_kernel with config BK: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_gated_delta_rule_fwd_kkt_solve_kernel,
+with key as (16, 16, 128, 16, 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16'),
+finished after 4.64s,
+best config selected: BK: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:06:08 [jit_monitor.py:140] Triton kernel JIT compilation during inference: recompute_w_u_fwd_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 2, num_ctas: 1, num_stages: 4, maxnreg: None
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 4, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 4, num_ctas: 1, num_stages: 4, maxnreg: None
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 8, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel recompute_w_u_fwd_kernel with config num_warps: 8, num_ctas: 1, num_stages: 4, maxnreg: None
+Triton autotuning for function recompute_w_u_fwd_kernel,
+with key as (16, 16, 128, 128, 64, 64, 64, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32'),
+finished after 2.98s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 4, maxnreg: None;
+Autotuning kernel chunk_gated_delta_rule_fwd_kernel_h_blockdim64 with config BV: 32, num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:06:11 [jit_monitor.py:140] Triton kernel JIT compilation during inference: chunk_gated_delta_rule_fwd_kernel_h_blockdim64. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel chunk_gated_delta_rule_fwd_kernel_h_blockdim64 with config BV: 64, num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kernel_h_blockdim64 with config BV: 32, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kernel_h_blockdim64 with config BV: 64, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
+Triton autotuning for function chunk_gated_delta_rule_fwd_kernel_h_blockdim64,
+with key as (16, 16, 128, 128, 64, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.float32'),
+finished after 2.20s,
+best config selected: BV: 32, num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None;
+Autotuning kernel chunk_fwd_kernel_o with config BK: 128, BV: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:06:13 [jit_monitor.py:140] Triton kernel JIT compilation during inference: chunk_fwd_kernel_o. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel chunk_fwd_kernel_o with config BK: 64, BV: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_fwd_kernel_o with config BK: 32, BV: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_fwd_kernel_o,
+with key as (16, 16, 128, 128, 64, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.bfloat16'),
+finished after 1.13s,
+best config selected: BK: 128, BV: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None;
+after wanda init: {'deleted': 161429, 'frac_of_gate': 0.001832746324085054, 'frac_of_model': 0.00021455408922026368}
+(MainProcess pid=1) INFO 11-11 21:06:21 [abstract.py:426] It took 0.092485 seconds to wake up tags {'weights', 'kv_cache'}.
+(MainProcess pid=1) INFO 11-11 21:06:21 [scheduler.py:3074] setting pause state to UNPAUSED
+(MainProcess pid=1) INFO 11-11 21:06:21 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:06:29 [scheduler.py:3074] setting pause state to PAUSED_NEW
+(MainProcess pid=1) INFO 11-11 21:06:29 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:06:29 [cumem.py:282] CuMemAllocator: sleep freed 29.51 GiB memory in total, of which 2.53 GiB is backed up in CPU and the rest 26.98 GiB is discarded directly.
+(MainProcess pid=1) INFO 11-11 21:06:29 [gpu_worker.py:335] Sleep mode freed 30.07 GiB memory, 3.19 GiB memory is still in use.
+(MainProcess pid=1) INFO 11-11 21:06:29 [abstract.py:408] It took 0.109359 seconds to fall asleep.
+EVAL {'step': 0, 'eval_acc': 0.421875, 'deleted': 161429, 'frac_of_gate': 0.001832746324085054, 'frac_of_model': 0.00021455408922026368, 'eval_s': 7.6}
+(MainProcess pid=1) INFO 11-11 21:06:29 [abstract.py:426] It took 0.079873 seconds to wake up tags {'weights', 'kv_cache'}.
+(MainProcess pid=1) INFO 11-11 21:06:29 [scheduler.py:3074] setting pause state to UNPAUSED
+(MainProcess pid=1) INFO 11-11 21:06:29 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:06:48 [scheduler.py:3074] setting pause state to PAUSED_NEW
+(MainProcess pid=1) INFO 11-11 21:06:48 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:06:48 [cumem.py:282] CuMemAllocator: sleep freed 29.51 GiB memory in total, of which 2.53 GiB is backed up in CPU and the rest 26.98 GiB is discarded directly.
+(MainProcess pid=1) INFO 11-11 21:06:48 [gpu_worker.py:335] Sleep mode freed 31.18 GiB memory, 3.19 GiB memory is still in use.
+(MainProcess pid=1) INFO 11-11 21:06:48 [abstract.py:408] It took 0.120911 seconds to fall asleep.
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function l2norm_fwd_kernel,
+with key as (128, 4, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32'),
+finished after 5.47s,
+best config selected: BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (49, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_gated_delta_rule_fwd_kernel_h_blockdim64 with config BV: 32, num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kernel_h_blockdim64 with config BV: 64, num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kernel_h_blockdim64 with config BV: 32, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_fwd_kernel_h_blockdim64 with config BV: 64, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
+Triton autotuning for function chunk_gated_delta_rule_fwd_kernel_h_blockdim64,
+with key as (16, 16, 128, 128, 64, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.bfloat16'),
+finished after 2.03s,
+best config selected: BV: 32, num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (39, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (33, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (28, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (22, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (14, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.53s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (8, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.57s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (6, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function l2norm_fwd_kernel,
+with key as (128, 3, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32'),
+finished after 5.37s,
+best config selected: BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (4, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (3, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (1, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (17, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:07:16 [jit_monitor.py:140] Triton kernel JIT compilation during inference: chunk_bwd_kernel_dv_local. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 2, num_ctas: 1, num_stages: 4, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 4, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 4, num_ctas: 1, num_stages: 4, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 8, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dv_local with config num_warps: 8, num_ctas: 1, num_stages: 4, maxnreg: None
+Triton autotuning for function chunk_bwd_kernel_dv_local,
+with key as (16, 16, 128, 128, 64, 64, 64, True, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16'),
+finished after 2.85s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_gated_delta_rule_bwd_kernel_dhu_blockdim64 with config BV: 32, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:07:19 [jit_monitor.py:140] Triton kernel JIT compilation during inference: chunk_gated_delta_rule_bwd_kernel_dhu_blockdim64. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel chunk_gated_delta_rule_bwd_kernel_dhu_blockdim64 with config BV: 64, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_bwd_kernel_dhu_blockdim64 with config BV: 32, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
+Autotuning kernel chunk_gated_delta_rule_bwd_kernel_dhu_blockdim64 with config BV: 64, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
+Triton autotuning for function chunk_gated_delta_rule_bwd_kernel_dhu_blockdim64,
+with key as (16, 16, 128, 128, 64, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16'),
+finished after 2.51s,
+best config selected: BV: 32, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None;
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 2, num_ctas: 1, num_stages: 2, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:07:22 [jit_monitor.py:140] Triton kernel JIT compilation during inference: chunk_bwd_kernel_dqkwg. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 2, num_ctas: 1, num_stages: 4, maxnreg: None
+Autotuning failed with out of resource: shared memory, Required: 122884, Hardware limit: 101376. Reducing block sizes or `num_stages` may help.
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 4, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 4, num_ctas: 1, num_stages: 4, maxnreg: None
+Autotuning failed with out of resource: shared memory, Required: 122888, Hardware limit: 101376. Reducing block sizes or `num_stages` may help.
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 8, num_ctas: 1, num_stages: 2, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_bwd_kernel_dqkwg with config num_warps: 8, num_ctas: 1, num_stages: 4, maxnreg: None
+Autotuning failed with out of resource: shared memory, Required: 122896, Hardware limit: 101376. Reducing block sizes or `num_stages` may help.
+Triton autotuning for function chunk_bwd_kernel_dqkwg,
+with key as (16, 16, 128, 128, 64, 64, 64, True, False, True, False, 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.bfloat16', 'torch.float32'),
+finished after 5.85s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+(MainProcess pid=1) WARNING 11-11 21:07:28 [jit_monitor.py:140] Triton kernel JIT compilation during inference: prepare_wy_repr_bwd_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (17, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+(MainProcess pid=1) WARNING 11-11 21:07:28 [jit_monitor.py:140] Triton kernel JIT compilation during inference: l2norm_bwd_kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function l2norm_bwd_kernel,
+with key as (128, 3, 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16'),
+finished after 5.90s,
+best config selected: BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+/workspace/src/train_grpo_paper.py:401: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  mstats["pg_loss"] += float(pg_sum) / n_tok * scale / mini_per_step
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (2, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (2, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function l2norm_bwd_kernel,
+with key as (128, 2, 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16'),
+finished after 6.10s,
+best config selected: BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (14, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (3, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function l2norm_bwd_kernel,
+with key as (128, 4, 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16'),
+finished after 6.12s,
+best config selected: BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (7, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (7, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (1, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (8, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (11, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (11, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (9, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.53s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (9, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (6, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (10, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (10, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+{'step': 1, 'epoch': 0, 'reward': 0.39453125, 'pg_loss': 0.13718521515993107, 'clipfrac': 0.0007104668654309565, 'ppo_kl': 0.0001299423206578665, 'reg': 0.1903945915400982, 'grad_norm': 0.030299900099635124, 'alpha': 1019.3965517241379, 'lambda': 9.978448275862069e-06, 'frac_deleted_gate': 0.0018604142325265066, 'mean_len': 1236.125, 'clip_len_frac': 0.18359375, 'gen_s': 19.6, 'step_s': 104.4}
+(MainProcess pid=1) INFO 11-11 21:08:13 [abstract.py:426] It took 0.114041 seconds to wake up tags {'weights', 'kv_cache'}.
+(MainProcess pid=1) INFO 11-11 21:08:13 [scheduler.py:3074] setting pause state to UNPAUSED
+(MainProcess pid=1) INFO 11-11 21:08:13 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:08:31 [scheduler.py:3074] setting pause state to PAUSED_NEW
+(MainProcess pid=1) INFO 11-11 21:08:31 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:08:31 [cumem.py:282] CuMemAllocator: sleep freed 29.51 GiB memory in total, of which 2.53 GiB is backed up in CPU and the rest 26.98 GiB is discarded directly.
+(MainProcess pid=1) INFO 11-11 21:08:31 [gpu_worker.py:335] Sleep mode freed 29.51 GiB memory, 6.95 GiB memory is still in use.
+(MainProcess pid=1) INFO 11-11 21:08:31 [abstract.py:408] It took 0.128035 seconds to fall asleep.
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (40, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (34, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (30, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (25, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (15, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 16, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 32, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 64, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_fwd_kernel with config BT: 128, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function l2norm_fwd_kernel,
+with key as (128, 1, 'torch.bfloat16', 'torch.bfloat16', 'torch.float32'),
+finished after 5.31s,
+best config selected: BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 16, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 32, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 64, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel l2norm_bwd_kernel with config BT: 128, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function l2norm_bwd_kernel,
+with key as (128, 1, 'torch.bfloat16', 'torch.float32', 'torch.bfloat16', 'torch.bfloat16'),
+finished after 5.96s,
+best config selected: BT: 8, num_warps: 16, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (13, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (13, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (20, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (20, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (12, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (12, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+{'step': 2, 'epoch': 0, 'reward': 0.36328125, 'pg_loss': 0.1690325272395208, 'clipfrac': 0.0006600768320741304, 'ppo_kl': 0.00012077123252663422, 'reg': 0.18990667909383774, 'grad_norm': 0.03252054750919342, 'alpha': 1045.2586206896551, 'lambda': 9.949712643678162e-06, 'frac_deleted_gate': 0.001886787868681408, 'mean_len': 1115.37890625, 'clip_len_frac': 0.16015625, 'gen_s': 18.1, 'step_s': 59.8}
+(MainProcess pid=1) INFO 11-11 21:09:13 [abstract.py:426] It took 0.128826 seconds to wake up tags {'weights', 'kv_cache'}.
+(MainProcess pid=1) INFO 11-11 21:09:13 [scheduler.py:3074] setting pause state to UNPAUSED
+(MainProcess pid=1) INFO 11-11 21:09:13 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:09:29 [scheduler.py:3074] setting pause state to PAUSED_NEW
+(MainProcess pid=1) INFO 11-11 21:09:29 [block_pool.py:905] Successfully reset prefix cache
+(MainProcess pid=1) INFO 11-11 21:09:29 [cumem.py:282] CuMemAllocator: sleep freed 29.51 GiB memory in total, of which 2.53 GiB is backed up in CPU and the rest 26.98 GiB is discarded directly.
+(MainProcess pid=1) INFO 11-11 21:09:29 [gpu_worker.py:335] Sleep mode freed 29.51 GiB memory, 6.95 GiB memory is still in use.
+(MainProcess pid=1) INFO 11-11 21:09:29 [abstract.py:408] It took 0.119191 seconds to fall asleep.
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (41, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (29, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (23, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (18, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.55s,
+best config selected: num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (5, 16, 64, False, False, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (15, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.54s,
+best config selected: num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None;
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 1, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 4, num_ctas: 1, num_stages: 3, maxnreg: None
+Autotuning kernel chunk_local_cumsum_scalar_kernel with config num_warps: 8, num_ctas: 1, num_stages: 3, maxnreg: None
+Triton autotuning for function chunk_local_cumsum_scalar_kernel,
+with key as (4, 16, 64, False, True, 'torch.float32', 'torch.float32'),
+finished after 0.58s,
+best config selected: num_warps: 2, num_ctas: 1, num_stages: 3, maxnreg: None;
+{'step': 3, 'epoch': 0, 'reward': 0.4140625, 'pg_loss': 0.0973332703583713, 'clipfrac': 0.0005944498764148934, 'ppo_kl': 5.6491468484283354e-05, 'reg': 0.18938858807086945, 'grad_norm': 0.02986380271613598, 'alpha': 1071.1206896551723, 'lambda': 9.920977011494253e-06, 'frac_deleted_gate': 0.0019077687036423456, 'mean_len': 968.5078125, 'clip_len_frac': 0.1171875, 'gen_s': 16.4, 'step_s': 39.9}
+CUDA Error: invalid argument at /workspace/csrc/cumem_allocator.cpp:249
